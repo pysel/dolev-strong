@@ -11,6 +11,6 @@ It works under the following assumptions:
 * Synchronous model (shared global clock, bound on message delays)
 * Known bound `f` on the number of Byzantine nodes.
 
-## How much `f` can be?
+## How big `f` can be?
 
 In the said assumptions, for `f` can be arbitrarily large. Even if 2 nodes run the protocol honestly, no matter how big `f` is, honest nodes will stay in sync with one another.
