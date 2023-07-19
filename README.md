@@ -13,4 +13,4 @@ It works under the following assumptions:
 
 ## How big `f` can be?
 
-In the said assumptions, for `f` can be arbitrarily large. Even if 2 nodes run the protocol honestly, no matter how big `f` is, honest nodes will stay in sync with one another.
+Under said assumptions, `f` can be arbitrarily large. Even if 2 nodes run the protocol honestly, no matter how big `f` is, honest nodes will always stay in sync with one another.
