@@ -11,6 +11,7 @@ pub fn gen_keypair() -> (PublicKey, SecretKey) {
 pub fn run_node(mode: node::Mode, port: String) {
     let (pubkey, privkey) = gen_keypair();
 
-    let node = node::new_node(pubkey, privkey, mode, port);
-    node.listen();
+    let mut node = node::new_node(pubkey, privkey, mode, port, 2);
+    node.connect_to_peers(2);
+    print!("{:?}", node.peers)
 }

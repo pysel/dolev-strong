@@ -1,12 +1,11 @@
-use std::io::Read;
-use std::net::TcpListener;
+use std::net::{TcpListener, TcpStream};
 use std::sync::mpsc;
 use std::thread;
 
 use crate::node;
 
 impl node::Node {
-    pub fn listen(self) {
+    pub fn connect_to_peers(&mut self, waiting_for_num_connections: i32) {
         let listener = TcpListener::bind(String::from(format!("127.0.0.1:{}", self.listen_port)))
             .expect("Could not bind to port");
 
@@ -25,29 +24,32 @@ impl node::Node {
                 }
             }
         });
+        
+        let mut peers: Vec<TcpStream> = vec![];
+        for stream in rx {
+            peers.push(stream);
 
-        for mut stream in rx {
-            let buf: &mut [u8] = &mut [0u8; 100];
-            stream.read(buf).unwrap();
-            println!("{:?}", buf);
+            if peers.len() == waiting_for_num_connections.try_into().expect("Could not convert waiting_for_num_connections into i32") {
+                break;
+            }
         }
+
+        self.set_peers(Some(peers));
+
+        // TODO: consider adding timeout
     }
-}
 
-#[cfg(test)]
-mod tests{
-    use crate::testutil;
-    use crate::node::Mode;
-    use crate::node;
-
-    #[test]
-    fn message_passing(){
-        let (pubkey, privkey) = testutil::gen_keypair();
-        let mode = Mode::LEADER;
-        let listen_port = 8000.to_string();
-        let node = node::new_node(pubkey, privkey, mode, listen_port);
-        node.listen();
-
-        print!("hello")
+    fn set_peers(&mut self, peers: Option<Vec<TcpStream>>) {
+        match &peers {
+            Some(p) => {
+                if self.num_peers != p.len().try_into().expect("Could not convery peers' length to i32") {
+                    panic!("Not all peers connected to node at port {}", self.listen_port)
+                }
+                self.peers = peers;
+            }
+            None => {
+                panic!("Attempt to set empty peers")
+            }
+        }
     }
 }
