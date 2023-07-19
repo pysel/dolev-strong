@@ -6,7 +6,6 @@ use std::env;
 
 mod node;
 mod message;
-mod connection;
 
 use message::Mode::{LEADER, FOLLOWER};
 

@@ -2,6 +2,7 @@
 
 use ed25519_dalek::{SecretKey, PublicKey};
 use crate::message;
+mod connection;
 
 pub struct Node {
     pubkey: PublicKey,
