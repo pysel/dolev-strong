@@ -5,7 +5,7 @@ use std::thread;
 use crate::node;
 
 impl node::Node {
-    pub fn connect_to_peers(&mut self) {
+    pub fn bind_and_wait_connection(&mut self) {
         let listener = TcpListener::bind(String::from(format!("127.0.0.1:{}", self.listen_port)))
             .expect("Could not bind to port");
 
