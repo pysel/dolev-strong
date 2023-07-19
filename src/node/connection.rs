@@ -1,26 +1,35 @@
+use std::io::Read;
 use std::net::TcpListener;
+use std::sync::mpsc;
+use std::thread;
 
 use crate::node;
 
 impl node::Node {
     pub fn listen(self) {
-        let listener = match TcpListener::bind(String::from(format!("127.0.0.1:{}", self.listen_port))) {
-            Ok(listener) => listener,
-            Err(e) => {
-                panic!("ERROR WHEN BINDING {e}");
-            }
-        };
+        let listener = TcpListener::bind(String::from(format!("127.0.0.1:{}", self.listen_port)))
+            .expect("Could not bind to port");
 
-        for stream in listener.incoming() {
-            match stream {
-                Ok(stream) => {
-                    println!("{:?}", stream)
-                }
+        let (tx, rx) = mpsc::channel();
 
-                Err(e) => {
-                    println!("ERROR CONNECTING: {e}")
+        thread::spawn(move || {
+            loop {
+                match listener.accept() {
+                    Ok((stream, _)) => {
+                        tx.send(stream).unwrap(); 
+                    }
+
+                    Err(e) => {
+                        println!("ERROR CONNECTING: {e}")
+                    }
                 }
             }
+        });
+
+        for mut stream in rx {
+            let buf: &mut [u8] = &mut [0u8; 100];
+            stream.read(buf).unwrap();
+            println!("{:?}", buf);
         }
     }
 }
