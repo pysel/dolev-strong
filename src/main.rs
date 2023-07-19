@@ -1,5 +1,5 @@
 use core::panic;
-use std::env;
+use std::{env, io::Read};
 
 mod node;
 mod message;
@@ -20,7 +20,18 @@ fn main() {
         }
     };
     
-    let port = String::from(&args[2]);
+    let port = args[2].parse::<i32>().unwrap();
+    let num_peers = args[3].parse::<i32>().unwrap();
 
-    testutil::run_node(mode, port, 1);
+    let node = testutil::run_node(mode, port, num_peers);
+    print!("{:?}", node.peers);
+
+    if let Some(peers) = node.peers {
+        for mut peer in peers {
+            let buf: &mut [u8] = &mut [0u8; 100];
+            println!("Received {} bytes", peer.read(buf).unwrap());
+            println!("{buf:?}")
+        }
+    }
+
 }
