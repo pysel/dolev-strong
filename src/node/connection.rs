@@ -5,7 +5,7 @@ use std::thread;
 use crate::node;
 
 impl node::Node {
-    pub fn connect_to_peers(&mut self, waiting_for_num_connections: i32) {
+    pub fn connect_to_peers(&mut self) {
         let listener = TcpListener::bind(String::from(format!("127.0.0.1:{}", self.listen_port)))
             .expect("Could not bind to port");
 
@@ -29,7 +29,7 @@ impl node::Node {
         for stream in rx {
             peers.push(stream);
 
-            if peers.len() == waiting_for_num_connections.try_into().expect("Could not convert waiting_for_num_connections into i32") {
+            if peers.len() == self.num_peers.try_into().expect("Could not convert waiting_for_num_connections into i32") {
                 break;
             }
         }

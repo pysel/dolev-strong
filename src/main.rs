@@ -22,5 +22,5 @@ fn main() {
     
     let port = String::from(&args[2]);
 
-    testutil::run_node(mode, port);
+    testutil::run_node(mode, port, 1);
 }
