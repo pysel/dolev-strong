@@ -33,3 +33,21 @@ impl node::Node {
         }
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::testutil;
+    use crate::node::Mode;
+    use crate::node;
+
+    #[test]
+    fn message_passing(){
+        let (pubkey, privkey) = testutil::gen_keypair();
+        let mode = Mode::LEADER;
+        let listen_port = 8000.to_string();
+        let node = node::new_node(pubkey, privkey, mode, listen_port);
+        node.listen();
+
+        print!("hello")
+    }
+}

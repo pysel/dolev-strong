@@ -1,13 +1,11 @@
-use node::new_node;
-use ed25519_dalek::{Keypair, PublicKey, SecretKey};
-use rand::rngs::OsRng;
 use core::panic;
 use std::env;
 
 mod node;
 mod message;
+mod testutil;
 
-use message::Mode::{LEADER, FOLLOWER};
+use node::Mode::{LEADER, FOLLOWER};
 
 fn main() {
     // first arg - node's mode (leader/follower), second - port
@@ -24,18 +22,5 @@ fn main() {
     
     let port = String::from(&args[2]);
 
-    run_node(mode, port);
-}
-
-fn run_node(mode: message::Mode, port: String) {
-    let (pubkey, privkey) = gen_keypair();
-
-    let node = new_node(pubkey, privkey, mode, port);
-    node.listen();
-}
-
-fn gen_keypair() -> (PublicKey, SecretKey) {
-    let mut csprng = OsRng{};
-    let keypair: Keypair = Keypair::generate(&mut csprng);
-    (keypair.public, keypair.secret)
+    testutil::run_node(mode, port);
 }
