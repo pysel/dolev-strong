@@ -57,7 +57,7 @@ mod tests {
     use crate::node::peer::{Peer, new_peer};
     use crate::node::Mode;
 
-    const TEST_CONFIG_FNAME: &'static str = "/src/utils/test-config.txt";
+    const TEST_CONFIG_FNAME: &'static str = "/src/testutil/test-config.txt";
     const TEST_CONFIG_INDEX: i32 = 0;
 
     #[test]
