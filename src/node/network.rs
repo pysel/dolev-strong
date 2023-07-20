@@ -3,12 +3,12 @@ use std::net::{TcpListener, TcpStream};
 use crate::node;
 
 impl node::Node {
-    // bind_and_wait_connection binds a listening port of this node and waits for other peers to connect to this port
+    // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
     pub fn bind_and_wait_connection(&mut self) {
-        let listener: TcpListener = TcpListener::bind(String::from(self.connection.listen_socket.clone()))
+        let listener: TcpListener = TcpListener::bind(String::from(self.config.listen_socket.clone()))
             .expect("Could not bind to port");
 
-        let num_peers: i32 = self.connection.num_peers.clone();
+        let num_peers: i32 = self.config.num_peers.clone();
         let mut peers: Vec<TcpStream> = vec![];
 
         loop { // wait until all peers are connected
@@ -37,10 +37,10 @@ impl node::Node {
     fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {
         match &peers {
             Some(p) => {
-                if self.connection.num_peers != p.len().try_into().expect("Could not convery peers' length to i32") {
-                    panic!("Not all peers connected to node at port {}", self.connection.listen_socket)
+                if self.config.num_peers != p.len().try_into().expect("Could not convery peers' length to i32") {
+                    panic!("Not all peers connected to node at port {}", self.config.listen_socket)
                 }
-                self.connection.listen_streams = peers;
+                self.config.listen_streams = peers;
             }
             None => {
                 panic!("Attempt to set empty peers")

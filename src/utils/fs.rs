@@ -38,8 +38,8 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
     }
 }
 
-use crate::node::connections::{Connection, new_connection}; 
-pub fn parse_connection_from_config(filename: String, config_index: i32) -> Connection {
+use crate::node::config::{Config, new_connection}; 
+pub fn parse_connection_from_config(filename: String, config_index: i32) -> Config {
     let config_lines = parse_splitted_lines(filename);
 
     let peers = lines_to_peers(config_lines.clone());

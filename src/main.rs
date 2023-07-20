@@ -13,9 +13,9 @@ fn main() {
 
     let node: node::Node = testutil::run_node(config_index, peers_file);
 
-    print!("{:?}", node.connection.listen_streams);
+    print!("{:?}", node.config.listen_streams);
 
-    if let Some(peers) = node.connection.listen_streams {
+    if let Some(peers) = node.config.listen_streams {
         for mut peer in peers {
             let buf: &mut [u8] = &mut [0u8; 100];
             println!("Received {} bytes", peer.read(buf).unwrap());

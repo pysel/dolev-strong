@@ -5,7 +5,7 @@ use crate::utils::fs::{parse_connection_from_config};
 
 mod network;
 pub mod peer;
-pub mod connections;
+pub mod config;
 
 pub enum Mode {
     LEADER,
@@ -15,13 +15,13 @@ pub enum Mode {
 pub struct Node {
     pubkey: PublicKey,
     privkey: SecretKey,
-    pub connection: connections::Connection,
+    pub config: config::Config,
 }
 
 pub fn new_node(pubkey: PublicKey, privkey: SecretKey, config_index: i32, path_to_config_file: String) -> Node {
     Node {
         pubkey,
         privkey,
-        connection: parse_connection_from_config(path_to_config_file, config_index),
+        config: parse_connection_from_config(path_to_config_file, config_index),
     }
 } 
