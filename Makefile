@@ -6,3 +6,6 @@ rund:
 	@echo
 	@cargo run $(CURDIR)/config.txt 0
 
+test-unit:
+	@clear
+	@cargo test

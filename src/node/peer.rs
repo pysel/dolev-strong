@@ -1,6 +1,6 @@
 // use ed25519_dalek::PublicKey;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Peer {
     ip: String,
     // pubkey: PublicKey,

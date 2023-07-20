@@ -7,6 +7,7 @@ mod network;
 pub mod peer;
 pub mod config;
 
+#[derive(Debug, PartialEq)]
 pub enum Mode {
     LEADER,
     FOLLOWER,
