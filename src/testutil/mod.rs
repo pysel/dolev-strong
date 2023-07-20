@@ -9,7 +9,7 @@ pub fn gen_keypair() -> (PublicKey, SecretKey) {
     (keypair.public, keypair.secret)
 }
 
-pub fn run_node(mode: node::Mode, port: i32, config_index: i32, path_to_config_file: String) -> node::Node {
+pub fn run_node(config_index: i32, path_to_config_file: String) -> node::Node {
     let (pubkey, privkey) = gen_keypair();
     let mut node = node::new_node(pubkey, privkey, config_index, path_to_config_file);
     println!("{:?}", node.connection.peers);

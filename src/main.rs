@@ -1,4 +1,3 @@
-use core::panic;
 use std::{env, io::Read};
 
 mod node;
@@ -6,26 +5,13 @@ mod message;
 mod testutil;
 mod utils;
 
-use node::Mode::{LEADER, FOLLOWER};
-
 fn main() {
     // first arg - node's mode (leader/follower), second - port
     let args: Vec<String> = env::args().collect();
+    let peers_file: String = args[1].clone();
+    let config_index: i32 = args[2].parse::<i32>().unwrap();
 
-    let mode = {
-        let mode_arg = args[1].as_str();
-        match mode_arg {
-            "leader" => LEADER,
-            "follower" => FOLLOWER,
-            _ => panic!("Invalid mode {mode_arg}, should be either `follower` or `leader`")
-        }
-    };
-    
-    let port: i32 = args[2].parse::<i32>().unwrap();
-    let config_index: i32 = args[3].parse::<i32>().unwrap();
-    let peers_file: String = args[4].clone();
-
-    let node: node::Node = testutil::run_node(mode, port, config_index, peers_file);
+    let node: node::Node = testutil::run_node(config_index, peers_file);
 
     print!("{:?}", node.connection.listen_streams);
 

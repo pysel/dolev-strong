@@ -5,7 +5,7 @@ use crate::node;
 impl node::Node {
     // bind_and_wait_connection binds a listening port of this node and waits for other peers to connect to this port
     pub fn bind_and_wait_connection(&mut self) {
-        let listener: TcpListener = TcpListener::bind(String::from(format!("127.0.0.1:{}", self.connection.listen_socket)))
+        let listener: TcpListener = TcpListener::bind(String::from(self.connection.listen_socket.clone()))
             .expect("Could not bind to port");
 
         let num_peers: i32 = self.connection.num_peers.clone();
