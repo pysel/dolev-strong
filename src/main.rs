@@ -4,6 +4,7 @@ use std::{env, io::Read};
 mod node;
 mod message;
 mod testutil;
+mod utils;
 
 use node::Mode::{LEADER, FOLLOWER};
 
@@ -21,12 +22,14 @@ fn main() {
     };
     
     let port = args[2].parse::<i32>().unwrap();
-    let num_peers = args[3].parse::<i32>().unwrap();
+    let config_index = args[3].parse::<i32>().unwrap();
+    let peers_file = args[4].clone();
 
-    let node = testutil::run_node(mode, port, num_peers);
-    print!("{:?}", node.listen_streams);
+    let node = testutil::run_node(mode, port, config_index, peers_file);
 
-    if let Some(peers) = node.listen_streams {
+    print!("{:?}", node.connection.listen_streams);
+
+    if let Some(peers) = node.connection.listen_streams {
         for mut peer in peers {
             let buf: &mut [u8] = &mut [0u8; 100];
             println!("Received {} bytes", peer.read(buf).unwrap());
