@@ -1,4 +1,4 @@
-use ed25519_dalek::PublicKey;
+// use ed25519_dalek::PublicKey;
 
 #[derive(Debug)]
 pub struct Peer {

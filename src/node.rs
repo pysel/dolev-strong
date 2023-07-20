@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use ed25519_dalek::{SecretKey, PublicKey};
-use crate::utils::fs::{parse_connection_from_config};
+use crate::utils::fs::parse_connection_from_config;
 
 mod network;
 pub mod peer;
