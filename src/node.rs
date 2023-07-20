@@ -19,9 +19,12 @@ pub struct Node {
 }
 
 pub fn new_node(pubkey: PublicKey, privkey: SecretKey, config_index: i32, path_to_config_file: String) -> Node {
-    Node {
+    let mut node = Node {
         pubkey,
         privkey,
         config: parse_connection_from_config(path_to_config_file, config_index),
-    }
+    };
+
+    node.bind_and_wait_connection();
+    node
 } 
