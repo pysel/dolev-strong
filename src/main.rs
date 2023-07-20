@@ -21,11 +21,11 @@ fn main() {
         }
     };
     
-    let port = args[2].parse::<i32>().unwrap();
-    let config_index = args[3].parse::<i32>().unwrap();
-    let peers_file = args[4].clone();
+    let port: i32 = args[2].parse::<i32>().unwrap();
+    let config_index: i32 = args[3].parse::<i32>().unwrap();
+    let peers_file: String = args[4].clone();
 
-    let node = testutil::run_node(mode, port, config_index, peers_file);
+    let node: node::Node = testutil::run_node(mode, port, config_index, peers_file);
 
     print!("{:?}", node.connection.listen_streams);
 
