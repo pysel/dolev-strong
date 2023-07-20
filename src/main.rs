@@ -24,9 +24,9 @@ fn main() {
     let num_peers = args[3].parse::<i32>().unwrap();
 
     let node = testutil::run_node(mode, port, num_peers);
-    print!("{:?}", node.peers);
+    print!("{:?}", node.listen_streams);
 
-    if let Some(peers) = node.peers {
+    if let Some(peers) = node.listen_streams {
         for mut peer in peers {
             let buf: &mut [u8] = &mut [0u8; 100];
             println!("Received {} bytes", peer.read(buf).unwrap());

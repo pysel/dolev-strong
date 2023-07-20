@@ -19,24 +19,23 @@ impl node::Node {
                         break;
                     }
                 }
-
                 Err(e) => {
                     println!("ERROR CONNECTING: {e}")
                 }
             }
         }
         
-        self.set_peers(Some(peers));
+        self.set_listen_stream(Some(peers));
         // TODO: consider adding timeout
     }
 
-    fn set_peers(&mut self, peers: Option<Vec<TcpStream>>) {
+    fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {
         match &peers {
             Some(p) => {
                 if self.num_peers != p.len().try_into().expect("Could not convery peers' length to i32") {
                     panic!("Not all peers connected to node at port {}", self.listen_port)
                 }
-                self.peers = peers;
+                self.listen_streams = peers;
             }
             None => {
                 panic!("Attempt to set empty peers")

@@ -16,7 +16,7 @@ pub struct Node {
     mode: Mode,
     pub listen_port: i32,
     num_peers: i32,
-    pub peers: Option<Vec<TcpStream>> // peers is a list of tcp connections to other processes
+    pub listen_streams: Option<Vec<TcpStream>> // listen_streams is a list of tcp connections from which to expect getting messages from other processes
 }
 
 pub fn new_node(pubkey: PublicKey, privkey: SecretKey, mode: Mode, listen_port: i32, num_peers: i32) -> Node {
@@ -26,6 +26,6 @@ pub fn new_node(pubkey: PublicKey, privkey: SecretKey, mode: Mode, listen_port: 
         mode,
         listen_port,
         num_peers,
-        peers: None,
+        listen_streams: None,
     }
 } 
