@@ -2,8 +2,9 @@
 
 use std::net::TcpStream;
 
-use ed25519_dalek::{SecretKey, PublicKey, ed25519::Error};
+use ed25519_dalek::{SecretKey, PublicKey};
 mod connection;
+
 pub enum Mode {
     LEADER,
     FOLLOWER,
