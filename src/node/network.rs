@@ -31,7 +31,7 @@ impl node::Node {
     }
 
     fn connect_to_peers(self) {
-
+        // TODO
     }
 
     fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {
