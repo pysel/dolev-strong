@@ -1,4 +1,5 @@
 use std::net::{TcpListener, TcpStream};
+use std::io::Error;
 
 use crate::node;
 
@@ -32,8 +33,13 @@ impl node::Node {
         // TODO: consider adding timeout
     }
 
-    fn connect_to_peers(self) {
-        // TODO
+    fn connect_to_peers(self) -> Vec<Result<TcpStream, Error>> {
+        let mut streams: Vec<Result<TcpStream, Error>> = Vec::new();
+        for peer in self.config.peers {
+            let stream = TcpStream::connect(peer.ip.clone());
+            streams.push(stream);
+        }
+        streams
     }
 
     fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {

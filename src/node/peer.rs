@@ -2,7 +2,7 @@
 
 #[derive(Debug, PartialEq)]
 pub struct Peer {
-    ip: String,
+    pub ip: String,
     // pubkey: PublicKey,
 }
 
