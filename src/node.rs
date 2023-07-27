@@ -17,16 +17,15 @@ pub enum Mode {
 pub struct Node {
     pubkey: PublicKey,
     privkey: SecretKey,
-    pub config: config::Config,
+    config: config::Config,
 }
 
 pub fn new_node(pubkey: PublicKey, privkey: SecretKey, config_index: i32, path_to_config_file: String) -> Node {
-    let mut node = Node {
+    let node = Node {
         pubkey,
         privkey,
         config: parse_config_from_file(path_to_config_file, config_index),
     };
 
-    node.bind_and_wait_connection();
     node
 } 
