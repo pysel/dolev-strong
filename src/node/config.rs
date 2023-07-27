@@ -14,6 +14,6 @@ pub fn new_connection(mode: Mode, num_peers: i32, peers: Vec<Peer>, listen_socke
     Config { mode, num_peers, peers, listen_socket, listen_streams }
 }
 
-fn parse_connection_from_config() -> Config {
+fn parse_config_from_file() -> Config {
     unimplemented!()
 }

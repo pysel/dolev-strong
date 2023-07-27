@@ -39,7 +39,7 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
 }
 
 use crate::node::config::{Config, new_connection}; 
-pub fn parse_connection_from_config(filename: String, config_index: i32) -> Config {
+pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
     let config_lines = parse_config_lines(filename);
 
     let peers = parse_peers(config_lines.clone());
