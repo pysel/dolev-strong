@@ -26,7 +26,7 @@ impl node::Node {
                 Ok((stream, _)) => {
                     peers.push(stream); // TODO: maybe add check if this is the accepted listener
         
-                    if peers.len() == num_peers.try_into().expect("Could not convert waiting_for_num_connections into i32") {
+                    if peers.len() == num_peers.try_into().expect("Could not convert num_peers into i32") {
                         break;
                     }
                 }
