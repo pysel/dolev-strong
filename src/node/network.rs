@@ -1,5 +1,8 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::Error;
+use std::time::{Instant, Duration};
+
+use crate::utils::vec::unwrap_streams;
 
 use crate::node;
 
@@ -33,19 +36,36 @@ impl node::Node {
         // TODO: consider adding timeout
     }
 
-    fn connect_to_peers(self) -> Vec<Result<TcpStream, Error>> {
+    // connect_to_peers tries connecting to peers, returns Result of all attempts
+    fn connect_to_peers(&self) -> Vec<Result<TcpStream, Error>> {
         let mut streams: Vec<Result<TcpStream, Error>> = Vec::new();
-        for peer in self.config.peers {
+        for peer in self.config.peers.clone() {
             let stream = TcpStream::connect(peer.ip.clone());
             streams.push(stream);
         }
         streams
     }
 
+    fn connect_until_success(&mut self) -> Option<Error> {
+        let start = Instant::now();
+
+        loop {
+            let streams = self.connect_to_peers();
+            if let Ok(streams) = unwrap_streams(streams) {
+                self.config.write_streams = Some(streams);
+                return None;
+            }
+
+            if start.elapsed() > Duration::from_secs(10) {
+                break Some(Error::new(std::io::ErrorKind::NotConnected, "Timeout triggered before self could connect to all peers"));
+            }
+        }
+    }
+
     fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {
         match &peers {
             Some(p) => {
-                if self.config.num_peers != p.len().try_into().expect("Could not convery peers' length to i32") {
+                if self.config.num_peers != p.len().try_into().expect("Could not convert peers' length to i32") {
                     panic!("Not all peers connected to node at port {}", self.config.listen_socket)
                 }
                 self.config.listen_streams = peers;

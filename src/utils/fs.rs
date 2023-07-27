@@ -47,7 +47,7 @@ pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
     let num_peers = parse_num_peers(config_lines.clone());
     let mode = parse_mode(config_lines.clone(), config_index);
 
-    new_config(mode, num_peers, peers, listen_socket, None)
+    new_config(mode, num_peers, peers, listen_socket, None, None)
 }
 
 #[cfg(test)]
