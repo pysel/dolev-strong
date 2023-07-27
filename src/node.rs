@@ -7,12 +7,13 @@ mod network;
 pub mod peer;
 pub mod config;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Mode {
     LEADER,
     FOLLOWER,
 }
 
+#[derive(Debug)]
 pub struct Node {
     pubkey: PublicKey,
     privkey: SecretKey,

@@ -1,15 +1,19 @@
 use std::fs::read_to_string;
+use std::net::SocketAddr;
+
 use crate::node::{peer, Mode};
 
 fn parse_peers(config_lines: Vec<Vec<String>>) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
 
     for line in config_lines {
-        result.push(peer::new_peer(line[0].clone()));
+        let addr: SocketAddr = line[0].parse().expect(&format!("Failed to parse socket address from line {}", line[0]));
+        result.push(peer::new_peer(addr));
     }
 
     result 
 }
+
 
 fn parse_config_lines(filename: String) -> Vec<Vec<String>> {
     let mut result: Vec<Vec<String>> = Vec::new();
@@ -25,8 +29,8 @@ fn parse_num_peers(config_lines: Vec<Vec<String>>) -> i32 {
     (config_lines.len() - 1).try_into().unwrap()
 }
 
-fn parse_listen_socket(config_lines: Vec<Vec<String>>, config_index: i32) -> String {
-    config_lines[config_index as usize][0].clone()
+fn parse_listen_socket(config_lines: Vec<Vec<String>>, config_index: i32) -> SocketAddr {
+    config_lines[config_index as usize][0].clone().parse().expect("Failed to parse listen socket")
 }
 
 pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
@@ -53,6 +57,7 @@ pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
 #[cfg(test)]
 mod tests {
     use std::env;
+    use std::net::{SocketAddr, Ipv4Addr, IpAddr};
     use super::{parse_config_lines, parse_peers, parse_num_peers, parse_listen_socket, parse_mode};
     use crate::node::peer::{Peer, new_peer};
     use crate::node::Mode;
@@ -83,10 +88,10 @@ mod tests {
         let peers = parse_peers(config_lines);
 
         let expected_peers: Vec<Peer> = vec![
-            new_peer("127.0.0.1:8000".to_owned()),
-            new_peer("127.0.0.1:8001".to_owned()),
-            new_peer("127.0.0.1:8002".to_owned()),
-            new_peer("127.0.0.1:8003".to_owned()),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8000)),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8001)),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8002)),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8003)),
         ];
 
         assert_eq!(peers, expected_peers)
@@ -106,14 +111,14 @@ mod tests {
 
     #[test]
     fn test_parse_listen_socket() {
-        let full_config_path = format!("{}{}", env::current_dir().unwrap().display(), TEST_CONFIG_FNAME);
+        let full_config_path: String = format!("{}{}", env::current_dir().unwrap().display(), TEST_CONFIG_FNAME);
 
-        let config_lines = parse_config_lines(full_config_path);
+        let config_lines: Vec<Vec<String>> = parse_config_lines(full_config_path);
 
-        let socket = parse_listen_socket(config_lines, TEST_CONFIG_INDEX);
-        let expected_socker = String::from("127.0.0.1:8000");
+        let socket: SocketAddr = parse_listen_socket(config_lines, TEST_CONFIG_INDEX);
+        let expected_socket: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8000);
 
-        assert_eq!(expected_socker, socket)
+        assert_eq!(expected_socket, socket)
     }
 
     #[test]

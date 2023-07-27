@@ -1,4 +1,4 @@
-use std::{env, io::Read};
+use std::env;
 
 mod node;
 mod message;
@@ -13,12 +13,6 @@ fn main() {
 
     let node: node::Node = testutil::run_node(config_index, peers_file);
 
-    if let Some(peers) = node.config.listen_streams {
-        for mut peer in peers {
-            let buf: &mut [u8] = &mut [0u8; 100];
-            println!("Received {} bytes", peer.read(buf).unwrap());
-            println!("{buf:?}")
-        }
-    }
+    print!("{node:?}")
 
 }
