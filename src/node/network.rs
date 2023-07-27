@@ -12,7 +12,7 @@ impl node::Node {
         let listener: TcpListener = TcpListener::bind(self.config.listen_socket())
             .expect("Failed to bind");
 
-        let num_peers: i32 = self.config.num_peers.clone();
+        let num_peers: i32 = self.config.num_peers();
         let mut peers: Vec<TcpStream> = vec![];
 
         println!("Listening on socket {}", self.config.listen_socket());
@@ -39,7 +39,7 @@ impl node::Node {
     // connect_to_peers tries connecting to peers, returns Result of all attempts
     fn connect_to_peers(&self) -> Vec<Result<TcpStream, Error>> {
         let mut streams: Vec<Result<TcpStream, Error>> = Vec::new();
-        for peer in self.config.peers.clone() {
+        for peer in self.config.peers() {
             let stream = TcpStream::connect(peer.socket.clone());
             streams.push(stream);
         }
@@ -66,7 +66,7 @@ impl node::Node {
     fn set_listen_stream(&mut self, peers: Option<Vec<TcpStream>>) {
         match &peers {
             Some(p) => {
-                if self.config.num_peers != p.len().try_into().expect("Could not convert peers' length to i32") {
+                if self.config.num_peers() != p.len().try_into().expect("Could not convert peers' length to i32") {
                     panic!("Not all peers connected to node at port {}", self.config.listen_socket())
                 }
                 self.config.set_listen_streams(peers);

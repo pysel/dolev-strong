@@ -4,9 +4,9 @@ use std::net::{TcpStream, SocketAddr};
 
 #[derive(Debug)]
 pub struct Config {
-    pub mode: Mode,
-    pub num_peers: i32,
-    pub peers: Vec<Peer>,
+    mode: Mode,
+    num_peers: i32,
+    peers: Vec<Peer>,
     listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
@@ -41,5 +41,33 @@ impl Config {
 
     pub fn listen_socket(&self) -> SocketAddr {
         self.listen_socket.clone()
+    }
+
+    pub fn set_peers(&mut self, peers: Vec<Peer>) {
+        self.peers = peers
+    }
+
+    pub fn peers(&self) -> Vec<Peer> {
+        self.peers.clone()
+    }
+
+    // unsafe
+    pub fn set_num_peers(&mut self, num_peers: i32) {
+        if num_peers <= 0 {
+            panic!("num_peers can only be set positive")
+        }
+        self.num_peers = num_peers
+    }
+
+    pub fn num_peers(&self) -> i32 {
+        self.num_peers
+    }
+
+    pub fn set_mode(&mut self, mode: Mode) {
+        self.mode = mode
+    }
+
+    pub fn mode(&self) -> Mode {
+        self.mode.clone()
     }
 }
