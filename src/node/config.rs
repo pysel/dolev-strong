@@ -13,7 +13,3 @@ pub struct Config {
 pub fn new_config(mode: Mode, num_peers: i32, peers: Vec<Peer>, listen_socket: String, listen_streams: Option<Vec<TcpStream>>) -> Config {
     Config { mode, num_peers, peers, listen_socket, listen_streams }
 }
-
-fn parse_config_from_file() -> Config {
-    unimplemented!()
-}
