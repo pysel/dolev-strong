@@ -7,7 +7,7 @@ pub struct Config {
     pub mode: Mode,
     pub num_peers: i32,
     pub peers: Vec<Peer>,
-    pub listen_socket: SocketAddr,
+    listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
 }
@@ -34,7 +34,12 @@ impl Config {
         panic!("Trying to set empty listen_streams")
     }
 
-    // pub fn set_listen_socket(&mut self, listen_socket: String) {
+    pub fn set_listen_socket(&mut self, listen_socket: String) {
+        let socket_addr: SocketAddr = listen_socket.parse().expect(&format!("Failed to parse SocketAddr from line {listen_socket}"));
+        self.listen_socket = socket_addr;
+    }
 
-    // }
+    pub fn listen_socket(&self) -> SocketAddr {
+        self.listen_socket.clone()
+    }
 }

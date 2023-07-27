@@ -9,13 +9,13 @@ use crate::node;
 impl node::Node {
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
     pub fn bind_and_wait_connection(&mut self) {
-        let listener: TcpListener = TcpListener::bind(self.config.listen_socket.clone())
+        let listener: TcpListener = TcpListener::bind(self.config.listen_socket())
             .expect("Failed to bind");
 
         let num_peers: i32 = self.config.num_peers.clone();
         let mut peers: Vec<TcpStream> = vec![];
 
-        println!("Listening on socket {}", self.config.listen_socket);
+        println!("Listening on socket {}", self.config.listen_socket());
     
         loop { // wait until all peers are connected
             match listener.accept() {
@@ -67,7 +67,7 @@ impl node::Node {
         match &peers {
             Some(p) => {
                 if self.config.num_peers != p.len().try_into().expect("Could not convert peers' length to i32") {
-                    panic!("Not all peers connected to node at port {}", self.config.listen_socket)
+                    panic!("Not all peers connected to node at port {}", self.config.listen_socket())
                 }
                 self.config.set_listen_streams(peers);
             }
