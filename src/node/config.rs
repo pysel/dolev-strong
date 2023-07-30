@@ -26,12 +26,13 @@ impl Config {
         panic!("Trying to set empty write_streams")
     }
 
-    pub fn set_listen_streams(&mut self, listen_streams: Option<Vec<TcpStream>>) {
-        if let Some(streams) = listen_streams {
-            self.listen_streams = Some(streams);
+    pub fn set_listen_streams(&mut self, listen_streams: Vec<TcpStream>) {
+        if listen_streams.len() <= 0 {
+            panic!("Trying to set empty listen_streams")
         };
 
-        panic!("Trying to set empty listen_streams")
+        self.listen_streams = Some(listen_streams);
+        
     }
 
     pub fn set_listen_socket(&mut self, listen_socket: String) {

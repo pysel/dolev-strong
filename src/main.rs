@@ -13,7 +13,6 @@ fn main() {
 
     let mut node: node::Node = testutil::run_node(config_index, peers_file);
 
-    node.bind_and_wait_connection();
     print!("{node:?}")
 
 }
