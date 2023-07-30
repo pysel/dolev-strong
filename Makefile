@@ -12,7 +12,7 @@ run-nd:
 	@cargo run $(CURDIR)/config.txt 1
 
 run-mult: run-default run-nd
-	
+
 test-unit:
 	@clear
 	@cargo test

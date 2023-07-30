@@ -3,8 +3,9 @@ use std::net::SocketAddr;
 
 use crate::node::{peer, Mode};
 
-fn parse_peers(config_lines: Vec<Vec<String>>) -> Vec<peer::Peer> {
+fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
+    config_lines.remove(config_index.try_into().expect("Failed to convert i32 to usize"));
 
     for line in config_lines {
         let addr: SocketAddr = line[0].parse().expect(&format!("Failed to parse socket address from line {}", line[0]));
@@ -46,7 +47,7 @@ use crate::node::config::{Config, new_config};
 pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
     let config_lines = parse_config_lines(filename);
 
-    let peers = parse_peers(config_lines.clone());
+    let peers = parse_peers(&mut config_lines.clone(), config_index);
     let listen_socket = parse_listen_socket(config_lines.clone(), config_index.try_into().unwrap());
     let num_peers = parse_num_peers(config_lines.clone());
     let mode = parse_mode(config_lines.clone(), config_index);
@@ -84,11 +85,10 @@ mod tests {
     fn test_parse_peers() {
         let full_config_path = format!("{}{}", env::current_dir().unwrap().display(), TEST_CONFIG_FNAME);
 
-        let config_lines = parse_config_lines(full_config_path);
-        let peers = parse_peers(config_lines);
+        let mut config_lines = parse_config_lines(full_config_path);
+        let peers = parse_peers(&mut config_lines, TEST_CONFIG_INDEX);
 
         let expected_peers: Vec<Peer> = vec![
-            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8000)),
             new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8001)),
             new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8002)),
             new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8003)),

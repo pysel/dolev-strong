@@ -4,7 +4,6 @@ use std::thread;
 use std::time::{Instant, Duration};
 use std::sync::mpsc;
 
-use crate::utils::vec::unwrap_streams;
 use crate::node::peer::Peer;
 use crate::node;
 
@@ -21,26 +20,40 @@ impl node::Node {
         let (tx_bind, tx_conn) = (tx.clone(), tx);
         
         let peers: Vec<Peer> = self.config.peers();
+        println!("{peers:?}");
+        
         let listen_socket: SocketAddr = self.config.listen_socket();
         let num_peers: i32 = self.config.num_peers();
 
         // run thread that waits for connections from other nodes
         thread::spawn(move || {
-            if let Ok(conns) = Node::bind_and_wait_connection(listen_socket, num_peers) {
-                tx_bind.send(
-                    new_streams(conns, StreamType::LISTEN)
-                ).unwrap();
+            let streams = Node::bind_and_wait_connection(listen_socket, num_peers);
+            match streams {
+                Ok(streams) => {
+                    tx_bind.send(
+                        new_streams(streams, StreamType::LISTEN)
+                    ).unwrap();
+                }
+
+                Err(e) => {
+                    panic!("{e}");
+                }
             }
         });
 
         // run thread that connect to other nodes
         thread::spawn(move || {
-            if let Ok(streams) = Node::connect_until_success(peers) {
-                tx_conn.send(
-                    new_streams(streams, StreamType::SEND)
-                ).unwrap();
-            } else {
-                panic!("Failed to connect to all peers")
+            let streams = Node::connect_until_success(peers);
+            match streams {
+                Ok(streams) => {
+                    tx_conn.send(
+                        new_streams(streams, StreamType::SEND)
+                    ).unwrap();
+                }
+
+                Err(e) => {
+                    panic!("{e}");
+                }
             }
         });
 
@@ -83,26 +96,35 @@ impl node::Node {
     }
 
     // connect_to_peers tries connecting to peers, returns Result of all attempts
-    fn connect_to_peers(peers: &Vec<Peer>) -> Vec<Result<TcpStream, Error>> {
-        let mut streams: Vec<Result<TcpStream, Error>> = Vec::new();
+    fn connect_to_peers(peers: &Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
+        let mut streams: Vec<TcpStream> = Vec::new();
         for peer in peers {
-            let stream = TcpStream::connect(peer.socket.clone());
-            streams.push(stream);
+            match TcpStream::connect(peer.socket.clone()) {
+                Ok(connection) => {
+                    streams.push(connection);
+                }
+
+                Err(e) => {
+                    return Err(Error::new(ErrorKind::NotConnected, format!("Failed to connect to peer {} with error {}", peer.socket, e)));
+                }
+            }
         }
-        streams
+
+        Ok(streams)
     }
 
     fn connect_until_success(peers: Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
         let start: Instant = Instant::now();
 
         loop {
-            let streams: Vec<Result<TcpStream, Error>> = Node::connect_to_peers(&peers);
-            if let Ok(streams) = unwrap_streams(streams) {
+            let streams: Result<Vec<TcpStream>, Error> = Node::connect_to_peers(&peers);
+            if let Ok(streams) = streams {
                 return Ok(streams)
             }
 
             if start.elapsed() > Duration::from_secs(10) {
-                break Err(Error::new(ErrorKind::NotConnected, "Timeout triggered before self could connect to all peers"));
+                let error = streams.unwrap_err();
+                break Err(Error::new(ErrorKind::NotConnected, format!("Timeout triggered before self could connect to all peers: {error}")));
             }
         }
     }
