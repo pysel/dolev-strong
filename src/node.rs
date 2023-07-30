@@ -25,6 +25,5 @@ pub fn new_node(keypair: Keypair, config_index: i32, path_to_config_file: String
         keypair,
         config: parse_config_from_file(path_to_config_file, config_index),
     };
-
     node
 } 

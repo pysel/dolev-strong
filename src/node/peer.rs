@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Peer {
     pub socket: SocketAddr,
     // pubkey: PublicKey,

@@ -1,5 +1,5 @@
 use std::net::{TcpListener, TcpStream, SocketAddr};
-use std::io::{Error, ErrorKind};
+use std::io::{Error, ErrorKind, Write};
 use std::thread;
 use std::time::{Instant, Duration};
 use std::sync::mpsc;
@@ -143,7 +143,16 @@ impl node::Node {
         }
     }
 
-    // fn send_message(&self, msg: Vec<u8>) {
+    pub fn send_message(&self, recepient: Peer, msg: Vec<u8>) -> Option<Error> {
+        if let Ok(mut write_conn) = self.config.get_write_tcp_stream(recepient) {
+            match write_conn.write_all(&msg) {
+                Err(e) => {
+                    return Some(Error::new(ErrorKind::Other, format!("Failed to send message with error {e}")));
+                }
+                _ => ()
+            }
+        }
 
-    // }
+        Some(Error::new(ErrorKind::AddrNotAvailable, format!("Connection to {:?} not found", recepient.socket)))
+    }
 }

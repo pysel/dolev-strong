@@ -1,6 +1,8 @@
 use super::peer::Peer;
 use super::Mode;
 use std::net::{TcpStream, SocketAddr};
+use std::io::{Error, ErrorKind};
+
 
 #[derive(Debug)]
 pub struct Config {
@@ -31,7 +33,6 @@ impl Config {
         };
 
         self.listen_streams = Some(listen_streams);
-        
     }
 
     pub fn set_listen_socket(&mut self, listen_socket: String) {
@@ -70,4 +71,17 @@ impl Config {
     pub fn mode(&self) -> Mode {
         self.mode.clone()
     }
+    
+    pub fn get_write_tcp_stream(&self, peer: Peer) -> Result<&TcpStream, Error> {
+        if let Some(streams) = &self.write_streams {
+            for conn in streams {
+                if conn.peer_addr().expect("Failed to get peer's address") == peer.socket {
+                    return Ok(conn)
+                }
+            }
+        } 
+        Err(Error::new(ErrorKind::InvalidData, "Trying to find peer's connection w/o established connection"))
+    }
+
+    // pub fn receive_from(peer: Peer) -> Vec<u8>
 }
