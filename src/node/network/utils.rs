@@ -1,10 +1,13 @@
 use std::net::TcpStream;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum StreamType {
     LISTEN,
     SEND,
 }
+
+
+#[derive(Debug)]
 pub struct Streams {
     pub streams: Vec<TcpStream>,
     pub s_type: StreamType, 
