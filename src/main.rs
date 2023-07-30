@@ -11,8 +11,5 @@ fn main() {
     let peers_file: String = args[1].clone();
     let config_index: i32 = args[2].parse::<i32>().unwrap();
 
-    let mut node: node::Node = testutil::run_node(config_index, peers_file);
-
-    print!("{node:?}")
-
+    let _: node::Node = testutil::run_node(config_index, peers_file);
 }

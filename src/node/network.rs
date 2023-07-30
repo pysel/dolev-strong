@@ -45,9 +45,14 @@ impl node::Node {
         });
 
         for received in rx {
+            println!("Received {received:?}");
+            
             if received.s_type == StreamType::LISTEN {
-                println!("Received {received:?}");
-                self.config.set_listen_streams(received.streams)
+                let listen_streams = received.streams;
+                self.config.set_listen_streams(listen_streams)
+            } else {
+                let write_streams = received.streams;
+                self.config.set_write_streams(write_streams)
             }
         }
     }

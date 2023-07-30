@@ -18,12 +18,11 @@ pub fn new_config(mode: Mode, num_peers: i32, peers: Vec<Peer>, listen_socket: S
 
 impl Config {
     // Unsafe. Panics when trying to set None
-    pub fn set_write_streams(&mut self, write_streams: Option<Vec<TcpStream>>) {
-        if let Some(streams) = write_streams {
-            self.write_streams = Some(streams);
-        }
-
-        panic!("Trying to set empty write_streams")
+    pub fn set_write_streams(&mut self, write_streams: Vec<TcpStream>) {
+        if write_streams.len() <= 0 {
+            panic!("Trying to set empty listen_streams")
+        };
+        self.write_streams = Some(write_streams);
     }
 
     pub fn set_listen_streams(&mut self, listen_streams: Vec<TcpStream>) {
