@@ -1,14 +1,18 @@
 #![allow(dead_code)]
+use ed25519_dalek::PublicKey;
 
-use ed25519_dalek::Signature;
+mod serde;
 
 // A binary value all honest nodes must agree on
 pub enum Value {
     Zero,
     One,
 }
+pub struct ConsensusMsg(Value);
 
-pub struct Message {
-    value: Value,
-    signatures: Vec<Signature>
+pub struct PubkeyBroadcastMsg(PublicKey);
+pub fn new_pk_broadcast_msg(pk: PublicKey) -> PubkeyBroadcastMsg {
+    PubkeyBroadcastMsg(pk)
 }
+
+pub struct EncodedMsg([u8]);
