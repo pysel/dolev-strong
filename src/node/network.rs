@@ -58,8 +58,6 @@ impl node::Node {
         });
 
         for received in rx {
-            println!("Received {received:?}");
-            
             if received.s_type == StreamType::LISTEN {
                 let listen_streams = received.streams;
                 self.config.set_listen_streams(listen_streams)

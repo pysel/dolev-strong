@@ -11,9 +11,9 @@ impl Node {
         }
     }
 
-    fn receive_pubkeys(&mut self) {
-        for peer in self.config.peers() {
-            
-        }
-    }
+    // fn receive_pubkeys(&mut self) {
+    //     for peer in self.config.get_write_tcp_stream(peer) {
+
+    //     }
+    // }
 }
