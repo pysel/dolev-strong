@@ -4,6 +4,7 @@ use ed25519_dalek::Keypair;
 use crate::utils::fs::parse_config_from_file;
 
 mod network;
+mod message;
 pub mod peer;
 pub mod config;
 pub mod auth;

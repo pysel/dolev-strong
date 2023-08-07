@@ -1,7 +1,6 @@
 use std::env;
 
 mod node;
-mod message;
 mod testutil;
 mod utils;
 

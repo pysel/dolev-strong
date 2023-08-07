@@ -1,5 +1,5 @@
 use super::Node;
-use crate::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
+use crate::node::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
 impl Node {
     pub fn broadcast_pubkey(&self) {
