@@ -1,7 +1,10 @@
+use ed25519_dalek::PublicKey;
+
 use super::peer::Peer;
 use super::Mode;
+use super::message::serde::deserealize_pb;
 use std::net::{TcpStream, SocketAddr};
-use std::io::{Error, ErrorKind};
+use std::io::{Error, ErrorKind, Read};
 
 
 #[derive(Debug)]
@@ -83,5 +86,30 @@ impl Config {
         Err(Error::new(ErrorKind::InvalidData, "Trying to find peer's connection w/o established connection"))
     }
 
-    // pub fn receive_from(peer: Peer) -> Vec<u8>
+    // unsafe
+    pub fn read_pubkey_from_stream(&self, s_index: usize) -> Result<PublicKey, Error> {
+        let streams: &Vec<TcpStream> = self.listen_streams.as_ref().expect("Trying to read from a stream w/o setting streams");
+        let mut stream = &streams[s_index];
+        let mut buf: Vec<u8> = Vec::new();
+        match stream.read_to_end(&mut buf) {
+            Err(e) => {
+                return Err(Error::new(
+                    std::io::ErrorKind::Other, 
+                    format!("Error when reading bytes on TCP stream in pk broadcast phase: {}", e)
+                ));
+            }
+
+            _ => {} // ignore ok
+        }
+
+        match deserealize_pb(&buf) {
+            Ok(pubkey) => {
+                return Ok(pubkey)
+            }
+
+            Err(e) => {
+                Err(e)
+            }
+        } 
+    }
 }

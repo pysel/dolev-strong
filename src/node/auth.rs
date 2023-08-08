@@ -1,6 +1,8 @@
 use super::Node;
 use crate::node::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
+pub mod verification;
+
 impl Node {
     pub fn broadcast_pubkey(&self) {
         let msg: PubkeyBroadcastMsg = new_pk_broadcast_msg(self.keypair.public);
@@ -11,9 +13,9 @@ impl Node {
         }
     }
 
-    // fn receive_pubkeys(&mut self) {
-    //     for peer in self.config.get_write_tcp_stream(peer) {
-
-    //     }
-    // }
+    fn receive_pubkeys(&mut self) {
+        for s_index in 0..self.config.peers().len()  {
+            self.config.read_pubkey_from_stream(s_index);
+        }
+    }
 }

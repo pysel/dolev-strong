@@ -1,7 +1,8 @@
 #![allow(dead_code)]
 use ed25519_dalek::PublicKey;
 
-mod serde;
+pub mod serde;
+mod types;
 
 // A binary value all honest nodes must agree on
 pub enum Value {
