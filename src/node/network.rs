@@ -23,11 +23,11 @@ impl node::Node {
         println!("{peers:?}");
         
         let listen_socket: SocketAddr = self.config.listen_socket();
-        let num_peers: i32 = self.config.num_peers();
+        let num_peers: usize = self.config.peers().len();
 
         // run thread that waits for connections from other nodes
         thread::spawn(move || {
-            let streams = Node::bind_and_wait_connection(listen_socket, num_peers);
+            let streams = Node::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
                     tx_bind.send(
@@ -130,7 +130,7 @@ impl node::Node {
     fn set_listen_streams(&mut self, streams: Option<Vec<TcpStream>>) {
         match streams {
             Some(streams) => {
-                if self.config.num_peers() != streams.len().try_into().expect("Could not convert peers' length to i32") {
+                if self.config.peers().len() != streams.len().try_into().expect("Could not convert peers' length to i32") {
                     panic!("Not all peers connected to node at port {}", self.config.listen_socket())
                 }
                 self.config.set_listen_streams(streams);

@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 use std::net::SocketAddr;
 
-use crate::node::{peer, Mode, config};
+use crate::node::{peer, Mode};
 
 fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
@@ -26,10 +26,6 @@ fn parse_config_lines(filename: String) -> Vec<Vec<String>> {
     result    
 }
 
-fn parse_num_peers(config_lines: Vec<Vec<String>>) -> i32 {
-    (config_lines.len() - 1).try_into().unwrap()
-}
-
 fn parse_listen_socket(config_lines: Vec<Vec<String>>, config_index: i32) -> SocketAddr {
     config_lines[config_index as usize][0].clone().parse().expect("Failed to parse listen socket")
 }
@@ -49,17 +45,16 @@ pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
 
     let peers: Vec<peer::Peer> = parse_peers(&mut config_lines.clone(), config_index);
     let listen_socket: SocketAddr = parse_listen_socket(config_lines.clone(), config_index.try_into().unwrap());
-    let num_peers: i32 = parse_num_peers(config_lines.clone());
     let mode: Mode = parse_mode(config_lines.clone(), config_index);
 
-    new_config(mode, config_index, num_peers, peers, listen_socket, None, None)
+    new_config(mode, config_index, peers, listen_socket, None, None)
 }
 
 #[cfg(test)]
 mod tests {
     use std::env;
     use std::net::{SocketAddr, Ipv4Addr, IpAddr};
-    use super::{parse_config_lines, parse_peers, parse_num_peers, parse_listen_socket, parse_mode};
+    use super::{parse_config_lines, parse_peers, parse_listen_socket, parse_mode};
     use crate::node::peer::{Peer, new_peer};
     use crate::node::Mode;
 
@@ -95,18 +90,6 @@ mod tests {
         ];
 
         assert_eq!(peers, expected_peers)
-    }
-
-    #[test]
-    fn test_parse_num_peers() {
-        let full_config_path = format!("{}{}", env::current_dir().unwrap().display(), TEST_CONFIG_FNAME);
-
-        let config_lines = parse_config_lines(full_config_path);
-
-        let num_peers = parse_num_peers(config_lines);
-        let expected_num_peers = 3;
-
-        assert_eq!(expected_num_peers, num_peers)
     }
 
     #[test]
