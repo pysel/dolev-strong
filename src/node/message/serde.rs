@@ -4,6 +4,7 @@ Serialization format:
 2b: msg type
 
 if pubkey broadcast: 
+    2b: config_index
     32b: pubkey
     64b: single signature
 
@@ -20,7 +21,7 @@ use super::PubkeyBroadcastMsg;
 use super::types::MSG_TYPE_PB;
 
 impl PubkeyBroadcastMsg {
-    pub fn serialize(&self, keypair: &Keypair) -> [u8; 98] {
+    pub fn serialize(&self, keypair: &Keypair, config_index: i32) -> [u8; 98] {
         let msg_type: &[u8] = MSG_TYPE_PB;
         let pubkey: &[u8; 32] = self.0.as_bytes();
         let mut bz: [u8; 34] = [0; 34];

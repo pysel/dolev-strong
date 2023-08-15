@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 use std::net::SocketAddr;
 
-use crate::node::{peer, Mode};
+use crate::node::{peer, Mode, config};
 
 fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
@@ -45,14 +45,14 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
 
 use crate::node::config::{Config, new_config}; 
 pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
-    let config_lines = parse_config_lines(filename);
+    let config_lines: Vec<Vec<String>>  = parse_config_lines(filename);
 
-    let peers = parse_peers(&mut config_lines.clone(), config_index);
-    let listen_socket = parse_listen_socket(config_lines.clone(), config_index.try_into().unwrap());
-    let num_peers = parse_num_peers(config_lines.clone());
-    let mode = parse_mode(config_lines.clone(), config_index);
+    let peers: Vec<peer::Peer> = parse_peers(&mut config_lines.clone(), config_index);
+    let listen_socket: SocketAddr = parse_listen_socket(config_lines.clone(), config_index.try_into().unwrap());
+    let num_peers: i32 = parse_num_peers(config_lines.clone());
+    let mode: Mode = parse_mode(config_lines.clone(), config_index);
 
-    new_config(mode, num_peers, peers, listen_socket, None, None)
+    new_config(mode, config_index, num_peers, peers, listen_socket, None, None)
 }
 
 #[cfg(test)]

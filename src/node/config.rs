@@ -10,6 +10,7 @@ use std::io::{Error, ErrorKind, Read};
 #[derive(Debug)]
 pub struct Config {
     mode: Mode,
+    config_index: i32,
     num_peers: i32,
     peers: Vec<Peer>,
     listen_socket: SocketAddr,
@@ -17,8 +18,8 @@ pub struct Config {
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
 }
 
-pub fn new_config(mode: Mode, num_peers: i32, peers: Vec<Peer>, listen_socket: SocketAddr, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
-    Config { mode, num_peers, peers, listen_socket, listen_streams, write_streams }
+pub fn new_config(mode: Mode, config_index: i32, num_peers: i32, peers: Vec<Peer>, listen_socket: SocketAddr, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
+    Config { mode, config_index, num_peers, peers, listen_socket, listen_streams, write_streams }
 }
 
 impl Config {
@@ -74,6 +75,10 @@ impl Config {
     pub fn mode(&self) -> Mode {
         self.mode.clone()
     }
+
+    pub fn config_index(&self) -> i32 {
+        return self.config_index
+    }
     
     pub fn get_write_tcp_stream(&self, peer: Peer) -> Result<&TcpStream, Error> {
         if let Some(streams) = &self.write_streams {
@@ -112,4 +117,6 @@ impl Config {
             }
         } 
     }
+
+
 }
