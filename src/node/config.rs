@@ -95,8 +95,8 @@ impl Config {
         }
 
         match deserealize_pb(&buf) {
-            Ok(pubkey) => {
-                return Ok(pubkey)
+            Ok(result) => {
+                return Ok(result.pubkey)
             }
 
             Err(e) => {
