@@ -142,15 +142,18 @@ impl node::Node {
     }
 
     pub fn send_message(&self, recepient: Peer, msg: Vec<u8>) -> Option<Error> {
-        if let Ok(mut write_conn) = self.config.get_write_tcp_stream(recepient) {
-            match write_conn.write_all(&msg) {
+        match self.config.get_write_tcp_stream(recepient) {
+            Ok(mut write_conn) => {
+                match write_conn.write_all(&msg) {
                 Err(e) => {
                     return Some(Error::new(ErrorKind::Other, format!("Failed to send message with error {e}")));
                 }
-                _ => ()
+                _ => return None
+            }}
+            
+            Err(e) => {
+                return Some(Error::new(ErrorKind::AddrNotAvailable, format!("Connection to {:?} not found with error {}", recepient.socket, e)))
             }
         }
-
-        Some(Error::new(ErrorKind::AddrNotAvailable, format!("Connection to {:?} not found", recepient.socket)))
     }
 }

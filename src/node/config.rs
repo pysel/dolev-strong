@@ -1,4 +1,5 @@
-use ed25519_dalek::PublicKey;
+use crate::node::peer::new_peer;
+use crate::utils::fs::{parse_mode, parse_config_lines};
 
 use super::peer::Peer;
 use super::Mode;
@@ -11,14 +12,15 @@ use std::io::{Error, ErrorKind, Read};
 pub struct Config {
     mode: Mode,
     config_index: i32,
+    config_file: String,
     peers: Vec<Peer>,
     listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
 }
 
-pub fn new_config(mode: Mode, config_index: i32, peers: Vec<Peer>, listen_socket: SocketAddr, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
-    Config { mode, config_index, peers, listen_socket, listen_streams, write_streams }
+pub fn new_config(mode: Mode, config_index: i32, config_file: String, peers: Vec<Peer>, listen_socket: SocketAddr, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
+    Config { mode, config_index, config_file, peers, listen_socket, listen_streams, write_streams }
 }
 
 impl Config {
@@ -79,31 +81,37 @@ impl Config {
     }
 
     // unsafe
-    pub fn read_pubkey_from_stream(&self, s_index: usize) -> Result<PublicKey, Error> {
+    pub fn receive_pubkeys(&mut self) -> Result<(), Error> {
         let streams: &Vec<TcpStream> = self.listen_streams.as_ref().expect("Trying to read from a stream w/o setting streams");
-        let mut stream = &streams[s_index];
-        let mut buf: Vec<u8> = Vec::new();
-        match stream.read_to_end(&mut buf) {
-            Err(e) => {
-                return Err(Error::new(
-                    std::io::ErrorKind::Other, 
-                    format!("Error when reading bytes on TCP stream in pk broadcast phase: {}", e)
-                ));
+        for (i, mut stream) in streams.into_iter().enumerate() {
+            let mut buf: Vec<u8> = Vec::new();
+            // println!("Receiving message on port {:?}. Node {}", stream.local_addr(), self.config_index);
+
+            match stream.read_to_end(&mut buf) {
+                Err(e) => {
+                    return Err(Error::new(
+                        std::io::ErrorKind::Other, 
+                        format!("Error when reading bytes on TCP stream in pk broadcast phase: {}", e)
+                    ));
+                }
+    
+                _ => {} // ignore ok
             }
 
-            _ => {} // ignore ok
+            match deserealize_pb(&buf) {
+                Ok(result) => {
+                    let config_lines = parse_config_lines(self.config_file.to_owned());
+                    let peer_mode = parse_mode(config_lines, result.peer_index);
+                    println!("{:?}", stream.peer_addr());
+                    self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
+                    return Ok(())
+                }
+    
+                Err(e) => {
+                    return Err(e)
+                }
+            } 
         }
-
-        match deserealize_pb(&buf) {
-            Ok(result) => {
-                return Ok(result.pubkey)
-            }
-
-            Err(e) => {
-                Err(e)
-            }
-        } 
+        Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
-
-
 }

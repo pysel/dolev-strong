@@ -8,8 +8,9 @@ mod message;
 pub mod peer;
 pub mod config;
 pub mod auth;
+pub mod sync;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Mode {
     LEADER,
     FOLLOWER,

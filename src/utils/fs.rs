@@ -9,14 +9,14 @@ fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<pe
 
     for line in config_lines {
         let addr: SocketAddr = line[0].parse().expect(&format!("Failed to parse socket address from line {}", line[0]));
-        result.push(peer::new_peer(addr));
+        result.push(peer::new_peer(addr, None, None, None));
     }
 
     result 
 }
 
 
-fn parse_config_lines(filename: String) -> Vec<Vec<String>> {
+pub fn parse_config_lines(filename: String) -> Vec<Vec<String>> {
     let mut result: Vec<Vec<String>> = Vec::new();
 
     for line in read_to_string(filename).unwrap().lines() {
@@ -41,13 +41,13 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
 
 use crate::node::config::{Config, new_config}; 
 pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
-    let config_lines: Vec<Vec<String>>  = parse_config_lines(filename);
+    let config_lines: Vec<Vec<String>>  = parse_config_lines(filename.to_owned());
 
     let peers: Vec<peer::Peer> = parse_peers(&mut config_lines.clone(), config_index);
     let listen_socket: SocketAddr = parse_listen_socket(config_lines.clone(), config_index.try_into().unwrap());
     let mode: Mode = parse_mode(config_lines.clone(), config_index);
 
-    new_config(mode, config_index, peers, listen_socket, None, None)
+    new_config(mode, config_index, filename, peers, listen_socket, None, None)
 }
 
 #[cfg(test)]
@@ -84,9 +84,9 @@ mod tests {
         let peers = parse_peers(&mut config_lines, TEST_CONFIG_INDEX);
 
         let expected_peers: Vec<Peer> = vec![
-            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8001)),
-            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8002)),
-            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8003)),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8001), None, None, None),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8002), None, None, None),
+            new_peer(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8003), None, None, None),
         ];
 
         assert_eq!(peers, expected_peers)
