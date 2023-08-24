@@ -1,0 +1,1 @@
+make run-mult -j2 # runs two nodes in parallel
