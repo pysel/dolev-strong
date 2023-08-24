@@ -14,8 +14,21 @@ use super::Node;
 mod utils;
 
 impl node::Node {
+    // setup establishes connections with other consensus participants and implements PKI
+    pub fn setup(&mut self) {
+        self.establish_all_connections();
+        self.establish_pki();
+    }
+
+    // establish_pki implements public key infrastructure trusted setup assumption.
+    // it broadcasts the pubkey of this node and receives pubkeys of all other nodes.
+    fn establish_pki(&mut self) {
+        self.broadcast_pubkey();
+        self.receive_pubkeys();
+    }
+
     // establish_all_connections connects and accepts connections to/from other nodes
-    pub fn establish_all_connections(&mut self) {
+    fn establish_all_connections(&mut self) {
         let (tx, rx) = mpsc::channel::<Streams>();
         let (tx_bind, tx_conn) = (tx.clone(), tx);
         
@@ -68,7 +81,7 @@ impl node::Node {
     }
 
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
-    pub fn bind_and_wait_connection(listen_socket: SocketAddr, num_peers: i32) -> Result<Vec<TcpStream>, Error> {
+    fn bind_and_wait_connection(listen_socket: SocketAddr, num_peers: i32) -> Result<Vec<TcpStream>, Error> {
         let listener: TcpListener = TcpListener::bind(listen_socket)
             .expect("Failed to bind");
 
