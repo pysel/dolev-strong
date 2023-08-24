@@ -9,7 +9,7 @@ run-nd:
 	@echo
 	@echo Launching peer...
 	@echo
-	@cargo run $(CURDIR)/config.txt 1
+	@cargo run $(CURDIR)/config.txt 1 > /dev/null
 
 run-mult: run-default run-nd
 
