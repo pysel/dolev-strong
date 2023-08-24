@@ -127,19 +127,19 @@ impl node::Node {
         }
     }
 
-    fn set_listen_streams(&mut self, streams: Option<Vec<TcpStream>>) {
-        match streams {
-            Some(streams) => {
-                if self.config.peers().len() != streams.len().try_into().expect("Could not convert peers' length to i32") {
-                    panic!("Not all peers connected to node at port {}", self.config.listen_socket())
-                }
-                self.config.set_listen_streams(streams);
-            }
-            None => {
-                panic!("Attempt to set empty peers")
-            }
-        }
-    }
+    // fn set_listen_streams(&mut self, streams: Option<Vec<TcpStream>>) {
+    //     match streams {
+    //         Some(streams) => {
+    //             if self.config.peers().len() != streams.len().try_into().expect("Could not convert peers' length to i32") {
+    //                 panic!("Not all peers connected to node at port {}", self.config.listen_socket())
+    //             }
+    //             self.config.set_listen_streams(streams);
+    //         }
+    //         None => {
+    //             panic!("Attempt to set empty peers")
+    //         }
+    //     }
+    // }
 
     pub fn send_message(&self, recepient: Peer, msg: Vec<u8>) -> Option<Error> {
         match self.config.get_write_tcp_stream(recepient) {
