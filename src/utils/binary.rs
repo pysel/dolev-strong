@@ -21,6 +21,7 @@ Conversion process:
 */
 
 mod tests {
+    #[allow(unused_imports)]
     use super::bytes_to_decimal;
 
     #[test]

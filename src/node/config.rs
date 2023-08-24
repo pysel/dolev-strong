@@ -85,7 +85,7 @@ impl Config {
         let streams: &Vec<TcpStream> = self.listen_streams.as_ref().expect("Trying to read from a stream w/o setting streams");
         for (i, mut stream) in streams.into_iter().enumerate() {
             let mut buf: SignedPkBroadcastType = [0; 102];
-            println!("Receiving message on port {:?} || From: {:?} || Index {}", stream.local_addr(), stream.peer_addr(), self.config_index);
+            // println!("Receiving message on port {:?} || From: {:?} || Index {}", stream.local_addr(), stream.peer_addr(), self.config_index);
 
             match stream.read_exact(&mut buf) {
                 Err(e) => {
@@ -99,11 +99,8 @@ impl Config {
             }
             match deserealize_pb(buf) {
                 Ok(result) => {
-                    println!("Received result: {:?}", result);
-
                     let config_lines = parse_config_lines(self.config_file.to_owned());
                     let peer_mode = parse_mode(config_lines, result.peer_index);
-                    // println!("{:?}", stream.peer_addr());
                     self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
                     return Ok(())
                 }
