@@ -2,7 +2,7 @@
 use ed25519_dalek::PublicKey;
 
 pub mod serde;
-mod types;
+pub mod types;
 
 // A binary value all honest nodes must agree on
 pub enum Value {

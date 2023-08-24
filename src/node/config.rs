@@ -4,9 +4,9 @@ use crate::utils::fs::{parse_mode, parse_config_lines};
 use super::peer::Peer;
 use super::Mode;
 use super::message::serde::deserealize_pb;
+use super::message::types::SignedPkBroadcastType;
 use std::net::{TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Read};
-
 
 #[derive(Debug)]
 pub struct Config {
@@ -84,10 +84,10 @@ impl Config {
     pub fn receive_pubkeys(&mut self) -> Result<(), Error> {
         let streams: &Vec<TcpStream> = self.listen_streams.as_ref().expect("Trying to read from a stream w/o setting streams");
         for (i, mut stream) in streams.into_iter().enumerate() {
-            let mut buf: Vec<u8> = Vec::new();
-            // println!("Receiving message on port {:?}. Node {}", stream.local_addr(), self.config_index);
+            let mut buf: SignedPkBroadcastType = [0; 102];
+            println!("Receiving message on port {:?} || From: {:?} || Index {}", stream.local_addr(), stream.peer_addr(), self.config_index);
 
-            match stream.read_to_end(&mut buf) {
+            match stream.read_exact(&mut buf) {
                 Err(e) => {
                     return Err(Error::new(
                         std::io::ErrorKind::Other, 
@@ -97,12 +97,13 @@ impl Config {
     
                 _ => {} // ignore ok
             }
-
-            match deserealize_pb(&buf) {
+            match deserealize_pb(buf) {
                 Ok(result) => {
+                    println!("Received result: {:?}", result);
+
                     let config_lines = parse_config_lines(self.config_file.to_owned());
                     let peer_mode = parse_mode(config_lines, result.peer_index);
-                    println!("{:?}", stream.peer_addr());
+                    // println!("{:?}", stream.peer_addr());
                     self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
                     return Ok(())
                 }

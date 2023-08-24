@@ -2,6 +2,9 @@ use ed25519_dalek::PublicKey;
 
 pub const MSG_TYPE_PB: &[u8] = "pb".as_bytes();
 
+pub type SignedPkBroadcastType = [u8; 102];
+
+#[derive(Debug)]
 pub struct PbBroadcastResult {
     pub pubkey: PublicKey,
     pub peer_index: i32,

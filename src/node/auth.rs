@@ -5,6 +5,8 @@ pub mod verification;
 
 impl Node {
     pub fn broadcast_pubkey(&self) {
+        println!("Broadcasting self pubkey...\n");
+
         let msg: PubkeyBroadcastMsg = new_pk_broadcast_msg(self.keypair.public);
         let bz: [u8; 102] = msg.serialize(&self.keypair, self.config.config_index());
 
@@ -19,8 +21,9 @@ impl Node {
     }
 
     pub fn receive_pubkeys(&mut self) {
+        println!("Receiving pubkeys...\n");
         if let Err(e) = self.config.receive_pubkeys() {
-            panic!("{}", e)
+            panic!("{e}");
         }
 
         wait_delta() // TODO: maybe not needed

@@ -20,7 +20,6 @@ impl node::Node {
         let (tx_bind, tx_conn) = (tx.clone(), tx);
         
         let peers: Vec<Peer> = self.config.peers();
-        println!("{peers:?}");
         
         let listen_socket: SocketAddr = self.config.listen_socket();
         let num_peers: usize = self.config.peers().len();
@@ -144,12 +143,29 @@ impl node::Node {
     pub fn send_message(&self, recepient: Peer, msg: Vec<u8>) -> Option<Error> {
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
-                match write_conn.write_all(&msg) {
-                Err(e) => {
-                    return Some(Error::new(ErrorKind::Other, format!("Failed to send message with error {e}")));
+                println!("Writing to peer: {:?} || local address: {:?} || index: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index());
+
+                // attempt to write a message
+                match write_conn.write(&msg) {
+                    Err(e) => {
+                        Some(Error::new(ErrorKind::Other, format!("Failed to send message with error {e}")))
+                    }
+
+                    _ => {
+                        // if message was successfully written, flush writer immediately 
+                        match write_conn.flush() {
+                            Err(e) => {
+                                return Some(Error::new(ErrorKind::Other, format!("Failed to flush connection {e}")))
+                            }
+
+                            Ok(_) => {
+                                return None
+                            }
+                        }
+
+                    }
                 }
-                _ => return None
-            }}
+            }
             
             Err(e) => {
                 return Some(Error::new(ErrorKind::AddrNotAvailable, format!("Connection to {:?} not found with error {}", recepient.socket, e)))
