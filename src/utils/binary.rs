@@ -1,4 +1,4 @@
-pub fn bytes_to_i32(bz: Vec<u8>) -> i32 {
+pub fn bytes_to_decimal(bz: Vec<u8>) -> i32 {
     let mut reverse_counter: u32 = (bz.len()).try_into().unwrap();
     let mut result: i32 = 0;
     for i in 0..bz.len() {
@@ -21,7 +21,7 @@ Conversion process:
 */
 
 mod tests {
-    use crate::utils::binary::bytes_to_i32;
+    use super::bytes_to_decimal;
 
     #[test]
     fn test_bytes_to_i32() {
@@ -54,7 +54,7 @@ mod tests {
         ];
 
         for test in tests {
-            let result: i32 = bytes_to_i32(test.bz);
+            let result: i32 = bytes_to_decimal(test.bz);
             assert_eq!(result, test.expected_result)
         }
     }

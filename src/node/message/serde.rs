@@ -39,7 +39,7 @@ impl PubkeyBroadcastMsg {
 }
 
 use crate::node::auth::verification::valid_signature;
-use crate::utils::binary::bytes_to_i32;
+use crate::utils::binary::bytes_to_decimal;
 pub fn deserealize_pb(bz: SignedPkBroadcastType) -> Result<PbBroadcastResult, Error> {
     let msg_type: &[u8] = &bz[..2];
     if msg_type != MSG_TYPE_PB {
@@ -47,7 +47,7 @@ pub fn deserealize_pb(bz: SignedPkBroadcastType) -> Result<PbBroadcastResult, Er
     }
 
     let config_index_bz: &[u8] = &bz[2..6];
-    let config_index: i32 = bytes_to_i32(config_index_bz.to_vec());
+    let config_index: i32 = bytes_to_decimal(config_index_bz.to_vec());
 
     let pubkey_bz: &[u8] = &bz[6..38];
     let pubkey = PublicKey::from_bytes(pubkey_bz)
