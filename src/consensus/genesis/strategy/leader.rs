@@ -7,7 +7,7 @@ pub struct LeaderStrategy;
 impl GenesisStrategy for LeaderStrategy {
     fn genesis_round(&self, self_node: &ConsensusNode) {
         let proposal_value: Value = random_proposal_value();
-        let proposal_message = new_propose_msg(proposal_value);
+        let proposal_message = &new_propose_msg(proposal_value);
     }
 }
 

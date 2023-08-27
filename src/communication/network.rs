@@ -140,6 +140,7 @@ impl communication::Communication {
         }
     }
 
+    // send_message sends message to a peer
     pub fn send_message(&self, recepient: Peer, msg: &dyn MessageI) -> Option<Error> {
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
@@ -171,5 +172,16 @@ impl communication::Communication {
                 return Some(Error::new(ErrorKind::AddrNotAvailable, format!("Connection to {:?} not found with error {}", recepient.socket, e)))
             }
         }
+    }
+
+    // broadcast_message sends message to all peers
+    pub fn broadcast_message(&self, msg: &dyn MessageI) -> Option<Error>{
+        for peer in self.config.peers() {
+            // println!("Sending message to {:?}. Communication {}", peer.socket, self.config.config_index());
+            if let Some(e) = self.send_message(peer, msg) {
+                return Some(Error::new(ErrorKind::Other, format!("Failed to send message to peer {:?} with error {}", peer.socket, e)))
+            }
+        }
+        None
     }
 }

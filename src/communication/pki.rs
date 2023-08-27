@@ -7,13 +7,9 @@ impl Communication {
     pub fn broadcast_pubkey(&self) {
         println!("Broadcasting self pubkey...\n");
 
-        let msg: PubkeyBroadcastMsg = new_pk_broadcast_msg(self.keypair.public);
-
-        for peer in self.config.peers() {
-            // println!("Sending message to {:?}. Communication {}", peer.socket, self.config.config_index());
-            if let Some(e) = self.send_message(peer, &msg) {
-                panic!("Failed to send message to peer {:?} with error {}", peer.socket, e)
-            }
+        let msg: &PubkeyBroadcastMsg = &new_pk_broadcast_msg(self.keypair.public);
+        if let Some(err) = self.broadcast_message(msg) {
+            panic!("{}", format!("failed to establish PKI: error: {}", err)) // panics because PKI assumption is not met
         }
 
         wait_delta() // wait before proceeding to make sure all messages were received 
