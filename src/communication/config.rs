@@ -5,17 +5,18 @@ use crate::utils::fs::{parse_mode, parse_config_lines};
 
 use super::peer::Peer;
 use super::Mode;
-use super::message::serde::deserealize_pb;
-use super::message::types::SignedPkBroadcastType;
+use super::message::serde::pk_broadcast::deserealize_pb;
+use super::message::types::pk_broadcast::SignedPkBroadcastBzType;
+
 use std::net::{TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Read};
 
 #[derive(Debug)]
 pub struct Config {
-    mode: Mode,
+    mode: Mode, // TODO: consider moving to ConsensusNode
     config_index: i32,
     config_file: String,
-    peers: Vec<Peer>,
+    peers: Vec<Peer>, // TODO: consider moving to ConsensusNode
     listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
@@ -86,7 +87,7 @@ impl Config {
     pub fn receive_pubkeys(&mut self) -> Result<(), Error> {
         let streams: &Vec<TcpStream> = self.listen_streams.as_ref().expect("Trying to read from a stream w/o setting streams");
         for (i, mut stream) in streams.into_iter().enumerate() {
-            let mut buf: SignedPkBroadcastType = [0; 102];
+            let mut buf: SignedPkBroadcastBzType = [0; 102];
             // println!("Receiving message on port {:?} || From: {:?} || Index {}", stream.local_addr(), stream.peer_addr(), self.config_index);
 
             match stream.read_exact(&mut buf) {

@@ -2,10 +2,10 @@ use ed25519_dalek::Keypair;
 use crate::utils::fs::parse_config_from_file;
 
 mod network;
-mod message;
 mod auth;
-pub mod sync;
 
+pub mod sync;
+pub mod message;
 pub mod peer;
 pub mod config;
 pub mod exported;
@@ -16,6 +16,7 @@ pub enum Mode {
     FOLLOWER,
 }
 
+// Communication contains keypair used when signing messages and a configuration struct
 pub struct Communication {
     keypair: Keypair,
     config: config::Config,
