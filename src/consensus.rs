@@ -27,7 +27,7 @@ impl<'a> ConsensusNode<'a> {
 
     // fn launch(&self) {
     //     if let Some(strategy) = self.genesis_strategy {
-    //         strategy.genesis_step(self);
+    //         strategy.genesis_round(self);
     //     }
     // }
 }
