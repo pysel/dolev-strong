@@ -9,16 +9,15 @@ use crate::node;
 
 use utils::{new_streams, StreamType, Streams};
 
-use super::Node;
+use super::Communication;
 
 mod utils;
 
-impl node::Node<'_> {
+impl node::Communication {
     // setup establishes connections with other consensus participants and implements PKI
     pub fn setup(&mut self) {
         self.establish_all_connections();
         self.establish_pki();
-        self.setup_genesis_strategy();
     }
 
     // establish_pki implements public key infrastructure trusted setup assumption.
@@ -40,7 +39,7 @@ impl node::Node<'_> {
 
         // run thread that waits for connections from other nodes
         thread::spawn(move || {
-            let streams = Node::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
+            let streams = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
                     tx_bind.send(
@@ -56,7 +55,7 @@ impl node::Node<'_> {
 
         // run thread that connect to other nodes
         thread::spawn(move || {
-            let streams = Node::connect_until_success(peers);
+            let streams = Communication::connect_until_success(peers);
             match streams {
                 Ok(streams) => {
                     tx_conn.send(
@@ -128,7 +127,7 @@ impl node::Node<'_> {
         let start: Instant = Instant::now();
 
         loop {
-            let streams: Result<Vec<TcpStream>, Error> = Node::connect_to_peers(&peers);
+            let streams: Result<Vec<TcpStream>, Error> = Communication::connect_to_peers(&peers);
             if let Ok(streams) = streams {
                 return Ok(streams)
             }

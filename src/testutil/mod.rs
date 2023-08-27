@@ -1,16 +1,7 @@
-use ed25519_dalek::Keypair;
-use rand::rngs::OsRng;
-use crate::node;
+use crate::consensus::ConsensusNode;
 
-pub fn gen_keypair() -> Keypair {
-    let mut csprng = OsRng{};
-    let keypair: Keypair = Keypair::generate(&mut csprng);
-    keypair
-}
 
-pub fn run_node(config_index: i32, path_to_config_file: String) -> node::Node<'static> {
-    let keypair = gen_keypair();
-    let mut node = node::new_node(keypair, config_index, path_to_config_file);
-    node.setup();
-    node
+pub fn run_node(config_index: i32, path_to_config_file: String) {
+    let consensus_node: ConsensusNode<'_> = ConsensusNode::new_consensus_node(config_index, path_to_config_file);
+    println!("{:?}", consensus_node.communication.get_mode());
 }
