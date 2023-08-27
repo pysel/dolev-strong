@@ -3,11 +3,11 @@ use std::io::{ErrorKind, Error};
 use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature, PublicKey};
 
 use crate::communication::message::PubkeyBroadcastMsg;
-use crate::communication::message::types::pk_broadcast::{MSG_TYPE_PB, PbBroadcastResult, new_pb_broadcast_result, SignedPkBroadcastBzType};
+use crate::communication::message::types::pk_broadcast::{MSG_TYPE_PB, PubkeyBroadcastMsgReceived, new_pb_broadcast_result, SignedPkBroadcastBzType};
 
 impl PubkeyBroadcastMsg {
     pub fn serialize(&self, keypair: &Keypair, config_index: i32) -> SignedPkBroadcastBzType {
-        let msg_type: &[u8] = MSG_TYPE_PB;
+        let msg_type: &[u8] = MSG_TYPE_PB.as_bytes();
         let pubkey: &[u8; 32] = self.0.as_bytes();
         let config_index_bz: [u8; 4] = config_index.to_be_bytes();
         let mut bz: [u8; 38] = [0; 38];
@@ -23,11 +23,10 @@ impl PubkeyBroadcastMsg {
     }
 }
 
-use crate::communication::auth::verification::valid_signature;
 use crate::utils::binary::bytes_to_decimal;
-pub fn deserealize_pb(bz: SignedPkBroadcastBzType) -> Result<PbBroadcastResult, Error> {
+pub fn deserealize_pb(bz: SignedPkBroadcastBzType) -> Result<PubkeyBroadcastMsgReceived, Error> {
     let msg_type: &[u8] = &bz[..2];
-    if msg_type != MSG_TYPE_PB {
+    if msg_type != MSG_TYPE_PB.as_bytes() {
         return Err(Error::new(ErrorKind::InvalidData, "Received bytes do not correspond to pubkey broadcast message"))
     }
 
@@ -42,10 +41,5 @@ pub fn deserealize_pb(bz: SignedPkBroadcastBzType) -> Result<PbBroadcastResult, 
     let signature: ed25519_dalek::Signature = <ed25519_dalek::Signature as Signature>::from_bytes(signature_bz)
         .expect("Failed to parse a signature from bytes received");
 
-    let bz_to_check = &bz[..38];
-    if !valid_signature(bz_to_check, pubkey, signature) {
-        return Err(Error::new(ErrorKind::Other, "Public key is received with a signature made not by the corresponding private key's owner"))
-    }
-
-    Ok(new_pb_broadcast_result(pubkey, config_index))
+    Ok(new_pb_broadcast_result(pubkey, config_index, bz, signature))
 }

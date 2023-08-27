@@ -1,15 +1,35 @@
-use ed25519_dalek::PublicKey;
+use std::any::Any;
 
-pub const MSG_TYPE_PB: &[u8] = "pb".as_bytes();
+use ed25519_dalek::{PublicKey, Signature, Verifier};
+
+use crate::communication::message::ReceivedMessageI;
+
+pub const MSG_TYPE_PB: &str = "pb";
 
 pub type SignedPkBroadcastBzType = [u8; 102];
 
 #[derive(Debug)]
-pub struct PbBroadcastResult {
+pub struct PubkeyBroadcastMsgReceived {
     pub pubkey: PublicKey,
     pub peer_index: i32,
+    bytes: SignedPkBroadcastBzType,
+    signature: Signature
 }
 
-pub fn new_pb_broadcast_result(pubkey: PublicKey, peer_index: i32) -> PbBroadcastResult {
-    PbBroadcastResult { pubkey, peer_index }
+impl ReceivedMessageI for PubkeyBroadcastMsgReceived {
+    fn valid_signature(&self) -> bool {
+        let bz_to_check = &self.bytes[..38];
+        if let Ok(_) = self.pubkey.verify(bz_to_check, &self.signature) {
+            return true
+        }
+        false
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+pub fn new_pb_broadcast_result(pubkey: PublicKey, peer_index: i32, bytes: SignedPkBroadcastBzType, signature: Signature) -> PubkeyBroadcastMsgReceived {
+    PubkeyBroadcastMsgReceived { pubkey, peer_index, bytes, signature }
 }

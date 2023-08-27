@@ -3,11 +3,12 @@
 use crate::communication::peer::new_peer;
 use crate::utils::fs::{parse_mode, parse_config_lines};
 
+use super::message::serde::deserealize;
 use super::peer::Peer;
 use super::Mode;
-use super::message::serde::pk_broadcast::deserealize_pb;
-use super::message::types::pk_broadcast::SignedPkBroadcastBzType;
+use super::message::types::pk_broadcast::{SignedPkBroadcastBzType, PubkeyBroadcastMsgReceived};
 
+use core::panic;
 use std::net::{TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Read};
 
@@ -100,12 +101,18 @@ impl Config {
     
                 _ => {} // ignore ok
             }
-            match deserealize_pb(buf) {
+            match deserealize(buf.to_vec()) {
                 Ok(result) => {
-                    let config_lines = parse_config_lines(self.config_file.to_owned());
-                    let peer_mode = parse_mode(config_lines, result.peer_index);
-                    self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
-                    return Ok(())
+                    if let Some(result) = (result.as_any()).downcast_ref::<PubkeyBroadcastMsgReceived>() {
+                        let config_lines = parse_config_lines(self.config_file.to_owned());
+                        let peer_mode = parse_mode(config_lines, result.peer_index);
+
+                        self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
+
+                        return Ok(())
+                    }
+
+                    panic!("failed to receive pubkeys: deserealized message failed to typecast") // trusted setup assumption not met, hence panic
                 }
     
                 Err(e) => {
