@@ -3,7 +3,7 @@ use crate::node::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
 pub mod verification;
 
-impl Node {
+impl Node<'_> {
     pub fn broadcast_pubkey(&self) {
         println!("Broadcasting self pubkey...\n");
 

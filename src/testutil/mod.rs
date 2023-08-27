@@ -8,7 +8,7 @@ pub fn gen_keypair() -> Keypair {
     keypair
 }
 
-pub fn run_node(config_index: i32, path_to_config_file: String) -> node::Node {
+pub fn run_node(config_index: i32, path_to_config_file: String) -> node::Node<'static> {
     let keypair = gen_keypair();
     let mut node = node::new_node(keypair, config_index, path_to_config_file);
     node.setup();

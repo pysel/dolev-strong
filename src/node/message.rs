@@ -9,6 +9,7 @@ pub enum Value {
     Zero,
     One,
 }
+
 pub struct ConsensusMsg(Value);
 
 pub struct PubkeyBroadcastMsg(PublicKey);

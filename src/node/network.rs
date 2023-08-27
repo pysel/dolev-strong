@@ -13,11 +13,12 @@ use super::Node;
 
 mod utils;
 
-impl node::Node {
+impl node::Node<'_> {
     // setup establishes connections with other consensus participants and implements PKI
     pub fn setup(&mut self) {
         self.establish_all_connections();
         self.establish_pki();
+        self.setup_genesis_strategy();
     }
 
     // establish_pki implements public key infrastructure trusted setup assumption.

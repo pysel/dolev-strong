@@ -3,6 +3,7 @@ use std::env;
 mod node;
 mod testutil;
 mod utils;
+mod consensus;
 
 fn main() {
     // first arg - node's mode (leader/follower), second - port
