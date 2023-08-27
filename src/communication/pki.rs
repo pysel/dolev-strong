@@ -1,3 +1,5 @@
+// PKI - public key infrastructure (trusted setup assumption)
+
 use super::{Communication, sync::wait_delta};
 use crate::communication::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
