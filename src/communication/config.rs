@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::node::peer::new_peer;
+use crate::communication::peer::new_peer;
 use crate::utils::fs::{parse_mode, parse_config_lines};
 
 use super::peer::Peer;

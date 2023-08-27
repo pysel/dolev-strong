@@ -1,4 +1,4 @@
-use crate::node::{Communication, self};
+use crate::communication::{Communication, self};
 use crate::utils;
 use self::genesis::strategy::GenesisStrategy;
 
@@ -12,7 +12,7 @@ pub struct ConsensusNode<'a> {
 impl<'a> ConsensusNode<'a> {
     pub fn new_consensus_node(config_index: i32, path_to_config_file: String) -> ConsensusNode<'a> {
         let keypair = utils::crypto::gen_keypair();
-        let mut communication = node::new_node(keypair, config_index, path_to_config_file);
+        let mut communication = communication::new_node(keypair, config_index, path_to_config_file);
         communication.setup(); // setup communications
 
         let mut consensus_node = ConsensusNode{communication, genesis_strategy: None };

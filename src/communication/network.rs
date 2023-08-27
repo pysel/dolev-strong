@@ -4,8 +4,8 @@ use std::thread;
 use std::time::{Instant, Duration};
 use std::sync::mpsc;
 
-use crate::node::peer::Peer;
-use crate::node;
+use crate::communication::peer::Peer;
+use crate::communication;
 
 use utils::{new_streams, StreamType, Streams};
 
@@ -13,7 +13,7 @@ use super::Communication;
 
 mod utils;
 
-impl node::Communication {
+impl communication::Communication {
     // setup establishes connections with other consensus participants and implements PKI
     pub fn setup(&mut self) {
         self.establish_all_connections();

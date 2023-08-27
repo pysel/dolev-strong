@@ -1,6 +1,6 @@
 use std::env;
 
-mod node;
+mod communication;
 mod testutil;
 mod utils;
 mod consensus;

@@ -38,7 +38,7 @@ impl PubkeyBroadcastMsg {
     }
 }
 
-use crate::node::auth::verification::valid_signature;
+use crate::communication::auth::verification::valid_signature;
 use crate::utils::binary::bytes_to_decimal;
 pub fn deserealize_pb(bz: SignedPkBroadcastType) -> Result<PbBroadcastResult, Error> {
     let msg_type: &[u8] = &bz[..2];

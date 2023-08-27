@@ -1,5 +1,5 @@
 use super::{Communication, sync::wait_delta};
-use crate::node::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
+use crate::communication::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
 pub mod verification;
 

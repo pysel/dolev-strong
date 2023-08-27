@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 use std::net::SocketAddr;
 
-use crate::node::{peer, Mode};
+use crate::communication::{peer, Mode};
 
 fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
@@ -39,7 +39,7 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
     }
 }
 
-use crate::node::config::{Config, new_config}; 
+use crate::communication::config::{Config, new_config}; 
 pub fn parse_config_from_file(filename: String, config_index: i32) -> Config {
     let config_lines: Vec<Vec<String>>  = parse_config_lines(filename.to_owned());
 
@@ -55,8 +55,8 @@ mod tests {
     use std::env;
     use std::net::{SocketAddr, Ipv4Addr, IpAddr};
     use super::{parse_config_lines, parse_peers, parse_listen_socket, parse_mode};
-    use crate::node::peer::{Peer, new_peer};
-    use crate::node::Mode;
+    use crate::communication::peer::{Peer, new_peer};
+    use crate::communication::Mode;
 
     const TEST_CONFIG_FNAME: &'static str = "/src/testutil/test-config.txt";
     const TEST_CONFIG_INDEX: i32 = 0;

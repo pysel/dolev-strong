@@ -1,4 +1,4 @@
-use crate::node::Mode::{LEADER, FOLLOWER};
+use crate::communication::Mode::{LEADER, FOLLOWER};
 
 use crate::consensus::genesis::strategy::{follower::FollowerStrategy, leader::LeaderStrategy};
 
