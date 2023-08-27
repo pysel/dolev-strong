@@ -2,7 +2,7 @@ use ed25519_dalek::Keypair;
 use crate::utils::fs::parse_config_from_file;
 
 mod network;
-mod auth;
+mod pki;
 
 pub mod sync;
 pub mod message;
