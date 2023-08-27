@@ -5,7 +5,7 @@ pub struct FollowerStrategy;
 
 impl GenesisStrategy for FollowerStrategy {
     fn genesis_step(&self, self_node: &ConsensusNode) {
-        wait_delta() // allow leader to send out a value proposal
+        wait_delta() // Round zero: allow leader to send out a value proposal.
 
     }
 }
