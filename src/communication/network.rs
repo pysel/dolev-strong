@@ -19,6 +19,7 @@ impl communication::Communication {
     pub fn setup(&mut self) {
         self.establish_all_connections();
         self.establish_pki();
+        println!("Setup done!")
     }
 
     // establish_pki implements public key infrastructure trusted setup assumption.

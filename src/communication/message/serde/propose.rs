@@ -2,11 +2,11 @@ use std::io::{Error, ErrorKind};
 
 use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature};
 
-use crate::{communication::message::{ProposeMsg, types::propose::{MSG_TYPE_PROP, SignedProposeBzType, ProposalMsgReceived, new_proposal_msg_received}, Value}, utils::message::bz_to_value};
+use crate::{communication::message::{ProposeMsg, types::propose::{MSG_TYPE_PROP, SignedProposeBzType, ProposalMsgReceived, new_proposal_msg_received}, Value, MessageI}, utils::message::bz_to_value};
 
-impl ProposeMsg {
+impl MessageI for ProposeMsg {
     // unused _config_index: only to implement MessageI
-    pub fn serialize(&self, keypair: &Keypair, _config_index: i32) -> SignedProposeBzType {
+    fn serialize(&self, keypair: &Keypair, _config_index: i32) -> Vec<u8> {
         let msg_type: &[u8] = MSG_TYPE_PROP.as_bytes();
         let proposing_value: u8 = self.0.serialize();
         let mut bz: [u8; 3] = [0; 3];
@@ -17,7 +17,7 @@ impl ProposeMsg {
         let mut signed_bz: SignedProposeBzType = [0; 67];
         signed_bz[..3].copy_from_slice(&bz);
         signed_bz[3..67].copy_from_slice(signature.as_bytes());
-        signed_bz
+        signed_bz.to_vec()
     }
 }
 

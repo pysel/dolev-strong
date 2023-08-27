@@ -7,8 +7,8 @@ use super::Mode;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Peer {
     pub socket: SocketAddr,
+    pub mode: Option<Mode>,
     pubkey: Option<PublicKey>,
-    mode: Option<Mode>,
     peer_write_socket: Option<SocketAddr>
 }
 

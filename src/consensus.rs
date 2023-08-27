@@ -1,3 +1,4 @@
+use crate::communication::peer::Peer;
 use crate::communication::{Communication, self};
 use crate::utils;
 use self::genesis::strategy::GenesisStrategy;
@@ -7,6 +8,8 @@ pub mod genesis;
 pub struct ConsensusNode<'a> {
     pub communication: Communication,
     pub genesis_strategy: Option<&'a dyn GenesisStrategy>,
+    self_is_leader: bool,
+    round_leader: Option<Peer>,
 }
 
 impl<'a> ConsensusNode<'a> {
@@ -15,7 +18,12 @@ impl<'a> ConsensusNode<'a> {
         let mut communication: Communication = communication::new_node(keypair, config_index, path_to_config_file);
         communication.setup(); // setup communications
 
-        let mut consensus_node: ConsensusNode<'_> = ConsensusNode{communication, genesis_strategy: None };
+        let (round_leader, self_is_leader) = match communication.get_round_leader() {
+            Some(peer) => (Some(peer), false),
+            None => (None, true)
+        };
+
+        let mut consensus_node: ConsensusNode<'_> = ConsensusNode{communication, genesis_strategy: None, self_is_leader, round_leader };
         consensus_node.setup_genesis_strategy(); // set genesis strategy for this node
 
         consensus_node

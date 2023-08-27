@@ -122,4 +122,18 @@ impl Config {
         }
         Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
+
+    pub fn get_round_leader(&self) -> Option<Peer> {
+        if self.mode() == Mode::LEADER {
+            return None
+        }
+        
+        for peer in self.peers() {
+            if peer.mode.unwrap() == Mode::LEADER {
+                return Some(peer)
+            }
+        }  
+        
+        panic!("No leader found")
+    }
 }
