@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use ed25519_dalek::{Signature, PublicKey, Verifier};
 
 pub fn valid_signature(bz: &[u8], pk: PublicKey, signature: Signature) -> bool {
