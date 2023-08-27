@@ -2,11 +2,11 @@ use std::io::{ErrorKind, Error};
 
 use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature, PublicKey};
 
-use crate::communication::message::PubkeyBroadcastMsg;
+use crate::communication::message::{PubkeyBroadcastMsg, MessageI};
 use crate::communication::message::types::pk_broadcast::{MSG_TYPE_PB, PubkeyBroadcastMsgReceived, new_pb_broadcast_result, SignedPkBroadcastBzType};
 
-impl PubkeyBroadcastMsg {
-    pub fn serialize(&self, keypair: &Keypair, config_index: i32) -> SignedPkBroadcastBzType {
+impl MessageI for PubkeyBroadcastMsg {
+    fn serialize(&self, keypair: &Keypair, config_index: i32) -> Vec<u8> {
         let msg_type: &[u8] = MSG_TYPE_PB.as_bytes();
         let pubkey: &[u8; 32] = self.0.as_bytes();
         let config_index_bz: [u8; 4] = config_index.to_be_bytes();
@@ -19,7 +19,7 @@ impl PubkeyBroadcastMsg {
         let mut signed_bz: SignedPkBroadcastBzType = [0; 102];
         signed_bz[..38].copy_from_slice(&bz);
         signed_bz[38..].copy_from_slice(signature.as_bytes());
-        signed_bz
+        signed_bz.to_vec()
     }
 }
 

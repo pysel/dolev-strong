@@ -8,11 +8,10 @@ impl Communication {
         println!("Broadcasting self pubkey...\n");
 
         let msg: PubkeyBroadcastMsg = new_pk_broadcast_msg(self.keypair.public);
-        let bz: [u8; 102] = msg.serialize(&self.keypair, self.config.config_index());
 
         for peer in self.config.peers() {
             // println!("Sending message to {:?}. Communication {}", peer.socket, self.config.config_index());
-            if let Some(e) = self.send_message(peer, bz.to_vec()) {
+            if let Some(e) = self.send_message(peer, &msg) {
                 panic!("Failed to send message to peer {:?} with error {}", peer.socket, e)
             }
         }

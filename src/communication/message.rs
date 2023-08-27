@@ -7,7 +7,7 @@ pub mod serde;
 pub mod types;
 
 pub trait MessageI {
-    fn serialize(&self, keypair: &Keypair, config_index: i32);
+    fn serialize(&self, keypair: &Keypair, config_index: i32) -> Vec<u8>;
 }
 
 pub trait ReceivedMessageI {
