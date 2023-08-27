@@ -15,7 +15,7 @@ impl PubkeyBroadcastMsg {
         bz[2..6].copy_from_slice(&config_index_bz);
         bz[6..].copy_from_slice(pubkey);
     
-        let signature = keypair.sign(&bz);
+        let signature: ed25519_dalek::Signature = keypair.sign(&bz);
         let mut signed_bz: SignedPkBroadcastBzType = [0; 102];
         signed_bz[..38].copy_from_slice(&bz);
         signed_bz[38..].copy_from_slice(signature.as_bytes());
@@ -25,7 +25,7 @@ impl PubkeyBroadcastMsg {
 
 use crate::utils::binary::bytes_to_decimal;
 pub fn deserealize_pb(bz: SignedPkBroadcastBzType) -> Result<PubkeyBroadcastMsgReceived, Error> {
-    let msg_type: &[u8] = &bz[..2];
+    let msg_type: &[u8] = &bz[..2]; // DRY-0
     if msg_type != MSG_TYPE_PB.as_bytes() {
         return Err(Error::new(ErrorKind::InvalidData, "Received bytes do not correspond to pubkey broadcast message"))
     }

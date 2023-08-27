@@ -3,8 +3,6 @@
 use super::{Communication, sync::wait_delta};
 use crate::communication::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
 
-pub mod verification;
-
 impl Communication {
     pub fn broadcast_pubkey(&self) {
         println!("Broadcasting self pubkey...\n");

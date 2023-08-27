@@ -8,13 +8,15 @@ if pubkey broadcast:
     32b: pubkey
     64b: single signature
 
-if consensus message:
+if consensus message: (special case - proposal message - single signature)
     1b: consensus value
     64b...: supporting signatures
 */
 use std::{str, io::{Error, ErrorKind}};
-use crate::communication::message::{types::{pk_broadcast::MSG_TYPE_PB, propose::MSG_TYPE_PROP}, serde::pk_broadcast::deserealize_pb};
+use crate::communication::message::{types::{pk_broadcast::MSG_TYPE_PB, propose::{MSG_TYPE_PROP, ProposalMsgReceived}}, serde::pk_broadcast::deserealize_pb};
 use crate::communication::message::types::pk_broadcast::PubkeyBroadcastMsgReceived;
+
+use self::propose::deserealize_prop;
 
 use super::ReceivedMessageI;
 
@@ -36,14 +38,25 @@ pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> {
                 }
 
                 Err(e) => {
-                    Err(Error::new(ErrorKind::InvalidInput, format!("failed to deserealize a message with error: {}", e)))
+                    Err(Error::new(ErrorKind::InvalidInput, format!("failed to deserealize a message with error: {}", e))) // DRY-2: export this error
                 }
             }
         }
 
         MSG_TYPE_PROP => {
-            // TODO
-            unimplemented!()
+            let result: Result<ProposalMsgReceived, Error> = deserealize_prop(
+                bz.try_into().expect("trying to deserealize proposal message of invalid format")
+            );
+
+            match result {
+                Ok(msg) => {
+                    Ok(Box::new(msg))
+                }
+
+                Err(e) => {
+                    Err(Error::new(ErrorKind::InvalidInput, format!("failed to deserealize a message with error: {}", e))) // DRY-2: export this error
+                }
+            }
         }
 
         _ => {
