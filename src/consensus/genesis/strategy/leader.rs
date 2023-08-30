@@ -1,5 +1,5 @@
 
-use crate::{consensus::ConsensusNode, communication::message::{Value, new_propose_msg}};
+use crate::{consensus::ConsensusNode, communication::{message::{Value, new_propose_msg}, sync::wait_delta}};
 use super::GenesisStrategy;
 use crate::communication::message::ProposeMsg;
 
@@ -7,10 +7,13 @@ pub struct LeaderStrategy;
 
 impl GenesisStrategy for LeaderStrategy {
     fn genesis_round(&self, self_node: &ConsensusNode) {
+        if !self_node.self_is_leader { panic!("follower node has leader's strategy") } // sanity check
+
         let proposal_value: Value = random_proposal_value();
         let proposal_message: &ProposeMsg = &new_propose_msg(proposal_value);
 
         self_node.communication.broadcast_message(proposal_message);
+        wait_delta(); // wait until first round ends
     }
 }
 
