@@ -104,8 +104,8 @@ impl Config {
             match deserealize(buf.to_vec()) {
                 Ok(result) => {
                     if let Some(result) = (result.as_any()).downcast_ref::<PubkeyBroadcastMsgReceived>() {
-                        let config_lines = parse_config_lines(self.config_file.to_owned());
-                        let peer_mode = parse_mode(config_lines, result.peer_index);
+                        let config_lines: Vec<Vec<String>> = parse_config_lines(self.config_file.to_owned());
+                        let peer_mode: Mode = parse_mode(config_lines, result.peer_index);
 
                         self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
 

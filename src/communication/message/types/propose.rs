@@ -26,8 +26,8 @@ pub fn new_proposal_msg_received(
 
 impl ReceivedMessageI for ProposalMsgReceived {
     fn valid_signatures(&self) -> bool {
-        let bz_to_check = &self.bytes[..3];
-        let sender_pubkey = self.sender_pubkey.expect("set sender pubkey before trying to validate message's signature");
+        let bz_to_check: &[u8] = &self.bytes[..3];
+        let sender_pubkey: PublicKey = self.sender_pubkey.expect("set sender pubkey before trying to validate message's signature");
         if let Ok(_) = sender_pubkey.verify(bz_to_check, &self.signature) {
             return true
         }

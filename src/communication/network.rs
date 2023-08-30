@@ -41,7 +41,7 @@ impl communication::Communication {
 
         // run thread that waits for connections from other nodes
         thread::spawn(move || {
-            let streams = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
+            let streams: Result<Vec<TcpStream>, Error> = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
                     tx_bind.send(
@@ -57,7 +57,7 @@ impl communication::Communication {
 
         // run thread that connect to other nodes
         thread::spawn(move || {
-            let streams = Communication::connect_until_success(peers);
+            let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(peers);
             match streams {
                 Ok(streams) => {
                     tx_conn.send(
