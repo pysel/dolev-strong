@@ -4,6 +4,7 @@ use crate::utils;
 use self::genesis::strategy::GenesisStrategy;
 
 pub mod genesis;
+pub mod sync;
 
 pub struct ConsensusNode<'a> {
     pub communication: Communication,

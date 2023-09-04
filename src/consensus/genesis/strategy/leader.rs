@@ -1,5 +1,6 @@
 
-use crate::{consensus::ConsensusNode, communication::{message::{Value, new_propose_msg}, sync::wait_delta}};
+use crate::{consensus::ConsensusNode, communication::message::{Value, new_propose_msg}};
+use crate::consensus::sync::wait_delta;
 use super::GenesisStrategy;
 use crate::communication::message::ProposeMsg;
 

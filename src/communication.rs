@@ -4,7 +4,6 @@ use crate::utils::fs::parse_config_from_file;
 mod network;
 mod pki;
 
-pub mod sync;
 pub mod message;
 pub mod peer;
 pub mod config;

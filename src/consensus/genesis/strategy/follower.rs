@@ -1,5 +1,5 @@
 use super::GenesisStrategy;
-use crate::{communication::sync::wait_delta, consensus::ConsensusNode};
+use crate::{consensus::sync::wait_delta, consensus::ConsensusNode};
 use crate::communication::peer::Peer;
 pub struct FollowerStrategy;
 
@@ -13,7 +13,5 @@ impl GenesisStrategy for FollowerStrategy {
         if let None = round_leader {
             panic!("no leader set at genesis")
         }
-
-        
     }
 }
