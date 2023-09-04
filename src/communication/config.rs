@@ -73,14 +73,22 @@ impl Config {
         return self.config_index
     }
     
-    pub fn get_write_tcp_stream(&self, peer: Peer) -> Result<&TcpStream, Error> {
-        if let Some(streams) = &self.write_streams {
+    // if write == true, returns write tcp streams (to send messages) else listen streams
+    pub fn get_tcp_stream(&self, peer: Peer, write: bool) -> Result<&TcpStream, Error> {
+        let streams: &Option<Vec<TcpStream>>;
+        if write {
+            streams = &self.write_streams;
+        } else {
+            streams = &self.listen_streams;
+        }
+
+        if let Some(streams) = streams {
             for conn in streams {
                 if conn.peer_addr().expect("Failed to get peer's address") == peer.socket {
                     return Ok(conn)
                 }
             }
-        } 
+        }
         Err(Error::new(ErrorKind::InvalidData, "Trying to find peer's connection w/o established connection"))
     }
 
