@@ -13,6 +13,9 @@ if consensus message: (special case - proposal message - single signature)
     64b...: supporting signatures
 */
 use std::{str, io::{Error, ErrorKind}};
+use ed25519_dalek::Signature;
+use ed25519_dalek::ed25519::signature::Signature as SignatureTrait;
+
 use crate::communication::message::{types::{pk_broadcast::MSG_TYPE_PB, propose::{MSG_TYPE_PROP, ProposalMsgReceived}}, serde::pk_broadcast::deserealize_pb};
 use crate::communication::message::types::pk_broadcast::PubkeyBroadcastMsgReceived;
 
@@ -65,4 +68,25 @@ pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> { //
         }
     };
     result
+}
+
+fn parse_signatures(bz: Vec<u8>) -> Result<Vec<Signature>, Error> {
+    if bz.len() % Signature::BYTE_SIZE != 0 {
+        return Err(Error::new(ErrorKind::InvalidInput, "bytes are of invalid form cannot be split into multiple signatures"))
+    }
+
+    let signatures_bz = bz.chunks(Signature::BYTE_SIZE);
+    let mut result: Vec<Signature> = vec![];
+    for signature_bz in signatures_bz {
+        match <ed25519_dalek::Signature as SignatureTrait>::from_bytes(signature_bz) {
+            Ok(signature) => {
+                result.push(signature)
+            }
+            Err(e) => {
+                return Err(Error::new(ErrorKind::InvalidInput, e));
+            }
+        }
+    }
+
+    Ok(result)
 }

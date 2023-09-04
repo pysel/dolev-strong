@@ -4,6 +4,8 @@ use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature};
 
 use crate::{communication::message::{ProposeMsg, types::propose::{MSG_TYPE_PROP, SignedProposeBzType, ProposalMsgReceived, new_proposal_msg_received}, Value, MessageI}, utils::message::bz_to_value};
 
+use super::parse_signatures;
+
 impl MessageI for ProposeMsg {
     // unused _config_index: only to implement MessageI
     fn serialize(&self, keypair: &Keypair, _config_index: i32) -> Vec<u8> {
@@ -33,8 +35,13 @@ pub fn deserealize_prop(bz: SignedProposeBzType) -> Result<ProposalMsgReceived, 
     };
 
     let signature_bz = &bz[3..];
-    let signature: ed25519_dalek::Signature = <ed25519_dalek::Signature as Signature>::from_bytes(signature_bz)
-        .expect("Failed to parse a signature from bytes received");
+    match parse_signatures(signature_bz.to_vec()) {
+        Ok(signatures) => {
+            return Ok(new_proposal_msg_received(proposed_value, bz, signatures, None))
 
-    Ok(new_proposal_msg_received(proposed_value, bz, signature, None))
+        },
+        Err(e) => {
+            return Err(Error::new(ErrorKind::InvalidInput, format!("failed to deserialize bytes to ProposalMsgReceived: {e}")));
+        },
+    }
 }

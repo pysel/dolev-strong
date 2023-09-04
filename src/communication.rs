@@ -18,7 +18,7 @@ pub enum Mode {
 // Communication contains keypair used when signing messages and a configuration struct
 pub struct Communication {
     keypair: Keypair,
-    config: config::Config,
+    pub config: config::Config,
 }
 
 pub fn new_node(keypair: Keypair, config_index: i32, path_to_config_file: String) -> Communication {

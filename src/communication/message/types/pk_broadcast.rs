@@ -17,7 +17,7 @@ pub struct PubkeyBroadcastMsgReceived {
 }
 
 impl ReceivedMessageI for PubkeyBroadcastMsgReceived {
-    fn valid_signatures(&self) -> bool {
+    fn convincing(&self) -> bool {
         let bz_to_check: &[u8] = &self.bytes[..38];
         if let Ok(_) = self.pubkey.verify(bz_to_check, &self.signature) {
             return true

@@ -11,11 +11,12 @@ pub trait MessageI {
 }
 
 pub trait ReceivedMessageI {
-    fn valid_signatures(&self) -> bool; // asserts that provided signature(s) is(are) valid
+    fn convincing(&self) -> bool; // asserts that provided signature(s) is(are) valid
     fn as_any(&self) -> &dyn Any; // required for downcasting
 }
 
 // A binary value all honest nodes must agree on
+#[derive(Clone)]
 pub enum Value {
     Zero,
     One,

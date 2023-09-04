@@ -21,7 +21,7 @@ impl<'a> ConsensusNode<'a> {
 
         let (round_leader, self_is_leader) = match communication.get_round_leader() {
             Some(peer) => (Some(peer), false),
-            None => (None, true)
+            None => (None, false)
         };
 
         let mut consensus_node: ConsensusNode<'_> = ConsensusNode{communication, genesis_strategy: None, self_is_leader, round_leader };
@@ -34,9 +34,11 @@ impl<'a> ConsensusNode<'a> {
         self.genesis_strategy = Some(strategy);
     }
 
-    // fn launch(&self) {
-    //     if let Some(strategy) = self.genesis_strategy {
-    //         strategy.genesis_round(self);
-    //     }
-    // }
+    pub fn launch(&self) {
+        if let Some(strategy) = self.genesis_strategy {
+            strategy.genesis_round(self);
+        } else {
+            panic!("trying to launch a node without specifying it's genesis strategy")
+        }
+    }
 }

@@ -17,7 +17,7 @@ pub struct Config {
     mode: Mode, // TODO: consider moving to ConsensusNode
     config_index: i32,
     config_file: String,
-    peers: Vec<Peer>, // TODO: consider moving to ConsensusNode
+    peers: Vec<Peer>,
     listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
@@ -111,7 +111,7 @@ impl Config {
             }
             match deserealize(buf.to_vec()) {
                 Ok(result) => {
-                    if let Some(result) = (result.as_any()).downcast_ref::<PubkeyBroadcastMsgReceived>() {
+                    if let Some(result) = result.as_any().downcast_ref::<PubkeyBroadcastMsgReceived>() {
                         let config_lines: Vec<Vec<String>> = parse_config_lines(self.config_file.to_owned());
                         let peer_mode: Mode = parse_mode(config_lines, result.peer_index);
 
@@ -138,6 +138,7 @@ impl Config {
         
         for peer in self.peers() {
             if peer.mode.unwrap() == Mode::LEADER {
+                println!("Leader");
                 return Some(peer)
             }
         }  
