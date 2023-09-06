@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::communication::peer::new_peer;
 use crate::utils::fs::{parse_mode, parse_config_lines};
 
@@ -44,26 +42,26 @@ impl Config {
         self.listen_streams = Some(listen_streams);
     }
 
-    pub fn set_listen_socket(&mut self, listen_socket: String) {
-        let socket_addr: SocketAddr = listen_socket.parse().expect(&format!("Failed to parse SocketAddr from line {listen_socket}"));
-        self.listen_socket = socket_addr;
-    }
+    // pub fn set_listen_socket(&mut self, listen_socket: String) {
+    //     let socket_addr: SocketAddr = listen_socket.parse().expect(&format!("Failed to parse SocketAddr from line {listen_socket}"));
+    //     self.listen_socket = socket_addr;
+    // }
 
     pub fn listen_socket(&self) -> SocketAddr {
         self.listen_socket.clone()
     }
 
-    pub fn set_peers(&mut self, peers: Vec<Peer>) {
-        self.peers = peers
-    }
+    // pub fn set_peers(&mut self, peers: Vec<Peer>) {
+    //     self.peers = peers
+    // }
 
     pub fn peers(&self) -> Vec<Peer> {
         self.peers.clone()
     }
 
-    pub fn set_mode(&mut self, mode: Mode) {
-        self.mode = mode
-    }
+    // pub fn set_mode(&mut self, mode: Mode) {
+    //     self.mode = mode
+    // }
 
     pub fn mode(&self) -> Mode {
         self.mode.clone()
