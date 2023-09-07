@@ -56,5 +56,7 @@ impl<'a> ConsensusNode<'a> {
         } else {
             panic!("trying to launch a node without specifying it's genesis strategy")
         }
+
+        
     }
 }

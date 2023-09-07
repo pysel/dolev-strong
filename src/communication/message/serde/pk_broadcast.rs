@@ -1,7 +1,5 @@
 use std::io::{ErrorKind, Error};
-
 use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature, PublicKey};
-
 use crate::communication::message::{PubkeyBroadcastMsg, MessageI};
 use crate::communication::message::types::pk_broadcast::{MSG_TYPE_PB, PubkeyBroadcastMsgReceived, new_pb_broadcast_result, SignedPkBroadcastBzType};
 

@@ -1,7 +1,5 @@
 use std::any::Any;
-
 use ed25519_dalek::{Signature, PublicKey, Verifier};
-
 use crate::communication::message::{Value, ReceivedMessageI};
 
 pub const MSG_TYPE_PROP: &str = "pr";
