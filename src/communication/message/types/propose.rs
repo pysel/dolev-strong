@@ -24,7 +24,7 @@ pub fn new_proposal_msg_received(
 }
 
 impl ReceivedMessageI for ProposalMsgReceived {
-    fn convincing(&self) -> bool {
+    fn convincing(&self) -> bool { // TODO!: add check that sender is actually a leader
         let bz_to_check: &[u8] = &self.bytes[..3];
         let sender_pubkey: PublicKey = self.sender_pubkey.expect("set sender pubkey before trying to validate message's signature");
 

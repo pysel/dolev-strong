@@ -16,17 +16,18 @@ use std::{str, io::{Error, ErrorKind}};
 use ed25519_dalek::Signature;
 use ed25519_dalek::ed25519::signature::Signature as SignatureTrait;
 
-use crate::communication::message::{types::{pk_broadcast::MSG_TYPE_PB, propose::{MSG_TYPE_PROP, ProposalMsgReceived}}, serde::pk_broadcast::deserealize_pb};
+use crate::communication::message::{types::{pk_broadcast::MSG_TYPE_PB, propose::{MSG_TYPE_PROP, ProposalMsgReceived}}, serde::{pk_broadcast::deserealize_pb, consensus::deserealize_con}};
 use crate::communication::message::types::pk_broadcast::PubkeyBroadcastMsgReceived;
 
 use self::propose::deserealize_prop;
 
-use super::ReceivedMessageI;
+use super::{ReceivedMessageI, types::consensus::{MSG_TYPE_CON, ConsensusMsgReceived}};
 
 pub mod pk_broadcast;
 pub mod propose;
+pub mod consensus;
 
-pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> { // TODO: use factory here, very bad design atm
+pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> { // TODO: use factory here, very bad design atm, DRY also 
     let message_type: &str = str::from_utf8(&bz[..2]).expect("Provided bytes have invalid message type");
     let result: Result<Box<dyn ReceivedMessageI>, Error> = match message_type {
         // Tries to deserealize as pubkey broadcast message
@@ -62,9 +63,23 @@ pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> { //
             }
         }
 
+        MSG_TYPE_CON => {
+            let result: Result<ConsensusMsgReceived, Error> = deserealize_con(
+                bz.try_into().expect("trying to deserealize consensus message of invalid format")
+            );
+
+            match result {
+                Ok(msg) => {
+                    Ok(Box::new(msg))
+                }
+
+                Err(e) => {
+                    Err(Error::new(ErrorKind::InvalidInput, format!("failed to deserealize a message with error: {}", e))) // DRY-2: export this error
+                }
+            }
+        }
         _ => {
-            // TODO
-            unimplemented!()
+            panic!("deserializing failed: unexpected message type")
         }
     };
     result

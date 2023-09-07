@@ -23,10 +23,12 @@ pub enum Value {
 }
 
 pub struct ConsensusMsg { 
-    proposed_value: Value,
-    supporting_signatures: Vec<Signature>,
+    value: Value,
+    signatures: Vec<Signature>, // those signatures, which node already knows (not-included node's yet)
 }
-// pub fn new_consensus_msg(proposed_value: Value)
+pub fn new_consensus_msg(value: Value, signatures: Vec<Signature>) -> ConsensusMsg {
+    ConsensusMsg { value, signatures }
+}
 
 pub struct ProposeMsg(Value);
 pub fn new_propose_msg(value: Value) -> ProposeMsg {
