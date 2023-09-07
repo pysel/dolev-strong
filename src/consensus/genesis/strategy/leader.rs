@@ -1,6 +1,5 @@
 
 use crate::{consensus::ConsensusNode, communication::message::{Value, new_propose_msg}};
-use crate::consensus::sync::wait_delta;
 use super::GenesisStrategy;
 use crate::communication::message::ProposeMsg;
 
@@ -14,7 +13,6 @@ impl GenesisStrategy for LeaderStrategy {
         let proposal_message: &ProposeMsg = &new_propose_msg(proposal_value);
 
         self_node.communication.broadcast_message(proposal_message);
-        wait_delta(); // wait until first round ends
     }
 }
 

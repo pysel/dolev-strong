@@ -10,6 +10,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let peers_file: String = args[1].clone();
     let config_index: i32 = args[2].parse::<i32>().unwrap();
+    let bootstrap_timestamp: u64 = args[3].parse::<u64>().unwrap(); // no nanoseconds
 
-    testutil::run_node(config_index, peers_file);
+    testutil::run_node(config_index, peers_file, bootstrap_timestamp);
 }
