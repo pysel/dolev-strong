@@ -4,7 +4,7 @@
 
 `Δ` - an upper bound on maximum message delays
 `f` - an upper bound on faulty processes a protocol can tolerate
-`stage` - a Δ length period of time when a node tries to find a convincing message and potentially convince others 
+`stage` - a Δ length period of time when a node tries to find a convincing message and potentially convince others
 
 ## How Synchronous Model works
 
