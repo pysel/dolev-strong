@@ -6,7 +6,7 @@ use crate::communication::message::ProposeMsg;
 pub struct LeaderStrategy;
 
 impl GenesisStrategy for LeaderStrategy {
-    fn genesis_stage(&self, self_node: &ConsensusNode) {
+    fn genesis_stage(&self, self_node: ConsensusNode) {
         if !self_node.self_is_leader { panic!("follower node has leader's strategy") } // sanity check
 
         let proposal_value: Value = random_proposal_value();
@@ -14,8 +14,7 @@ impl GenesisStrategy for LeaderStrategy {
 
         self_node.communication.broadcast_message(proposal_message);
 
-        println!("{:?}", proposal_message);
-        self_node.swait(10);
+        self_node.enter_stage(1);
     }
 }
 

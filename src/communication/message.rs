@@ -22,6 +22,7 @@ pub enum Value {
     One,
 }
 
+#[derive(Clone, Debug)]
 pub struct ConsensusMsg { 
     value: Value,
     signatures: Vec<Signature>, // those signatures, which node already knows (not-included node's yet)

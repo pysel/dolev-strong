@@ -1,6 +1,6 @@
 use std::any::Any;
 use ed25519_dalek::{Signature, PublicKey, Verifier};
-use crate::communication::message::{Value, ReceivedMessageI};
+use crate::communication::message::{Value, ReceivedMessageI, ConsensusMsg, new_consensus_msg};
 
 pub const MSG_TYPE_PROP: &str = "pr";
 
@@ -41,5 +41,17 @@ impl ReceivedMessageI for ProposalMsgReceived {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+}
+
+impl ProposalMsgReceived {
+    // convert_to_consensus_message converts received proposal to consensus message. Used when an honest node wants to notify peers of convincing proposal
+    pub fn convert_to_consensus_message(self) -> ConsensusMsg {
+        // sanity check, only needs to be signed by leader 
+        if self.signatures.len() != 1 {
+            panic!("proposal message received is invalid");
+        }
+
+        new_consensus_msg(self.proposed_value, self.signatures)
     }
 }

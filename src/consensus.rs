@@ -6,7 +6,7 @@ use self::sync::{Synchrony, new_synchrony};
 
 pub mod genesis;
 pub mod sync;
-mod protocol;
+pub mod protocol;
 
 pub struct ConsensusNode<'a> {
     pub communication: Communication,
@@ -49,7 +49,7 @@ impl<'a> ConsensusNode<'a> {
         self.synchrony.swait(r)
     }
 
-    pub fn launch(&self) {
+    pub fn launch(self) {
         if let Some(strategy) = self.genesis_strategy {
             strategy.genesis_stage(self);
         } else {

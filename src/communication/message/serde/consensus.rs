@@ -4,9 +4,7 @@ use ed25519_dalek::Signer;
 
 use crate::{communication::message::{MessageI, ConsensusMsg, types::consensus::{MSG_TYPE_CON, ConsensusMsgReceived, new_consensus_msg_received}, Value}, utils::message::bz_to_value};
 
-use super::parse_signatures;
-
-mod sersig;
+pub(crate) mod utils;
 
 impl MessageI for ConsensusMsg {
     fn serialize(&self, keypair: &ed25519_dalek::Keypair, _config_index: i32) -> Vec<u8> {
@@ -16,7 +14,7 @@ impl MessageI for ConsensusMsg {
         bz[..2].copy_from_slice(msg_type);
         bz[2] = proposing_value;
 
-        let mut known_signatures_bz = sersig::serialize_signatures(&self.signatures);
+        let mut known_signatures_bz = utils::serialize_signatures(&self.signatures);
         bz.append(&mut known_signatures_bz);
 
         let signature: ed25519_dalek::Signature = keypair.sign(&bz);
@@ -40,7 +38,7 @@ pub fn deserealize_con(bz: Vec<u8>) -> Result<ConsensusMsgReceived, Error> {
     };
 
     let signature_bz = &bz[3..];
-    match parse_signatures(signature_bz.to_vec()) {
+    match utils::parse_signatures(signature_bz.to_vec()) {
         Ok(signatures) => {
             return Ok(new_consensus_msg_received(proposed_value, bz, signatures, None))
 

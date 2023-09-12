@@ -1,11 +1,11 @@
 use super::GenesisStrategy;
-use crate::communication::message::ReceivedMessageI;
+use crate::communication::message::{ReceivedMessageI, ConsensusMsg};
 use crate::consensus::ConsensusNode;
 
 pub struct FollowerStrategy;
 
 impl GenesisStrategy for FollowerStrategy {
-    fn genesis_stage(&self, self_node: &ConsensusNode) {
+    fn genesis_stage(&self, self_node: ConsensusNode) {
         self_node.swait(0); // stage zero: allow leader to send out a value proposal.
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
@@ -16,10 +16,12 @@ impl GenesisStrategy for FollowerStrategy {
         };
 
         if !received_message.convincing() {
-            panic!("received proposal is not convincing") // TODO: Output null value - sender is Byzantine
+            panic!("received proposal is not convincing") // TODO: Output default value - sender is Byzantine
         }
 
-        println!("{:?}", received_message);
-        self_node.swait(10);
+        let consensus_message: ConsensusMsg = received_message.convert_to_consensus_message();
+        self_node.communication.broadcast_message(&consensus_message);
+        println!("Received convincing proposal, broadcasting: {:?}", consensus_message);
+        self_node.enter_stage(1);
     }
 }

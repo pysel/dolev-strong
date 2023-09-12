@@ -25,7 +25,6 @@ impl communication::Communication {
     // establish_pki implements public key infrastructure trusted setup assumption.
     // it broadcasts the pubkey of this node and receives pubkeys of all other nodes.
     fn establish_pki(&mut self) {
-        println!("Running {:?} node", self.get_mode());
         self.broadcast_pubkey();
         self.receive_pubkeys();
     }

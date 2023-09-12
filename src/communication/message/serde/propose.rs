@@ -1,7 +1,8 @@
 use std::io::{Error, ErrorKind};
 use ed25519_dalek::{Keypair, Signer, ed25519::signature::Signature};
+use super::consensus;
 use crate::{communication::message::{ProposeMsg, types::propose::{MSG_TYPE_PROP, SignedProposeBzType, ProposalMsgReceived, new_proposal_msg_received}, Value, MessageI}, utils::message::bz_to_value};
-use super::parse_signatures;
+use consensus::utils::parse_signatures;
 
 impl MessageI for ProposeMsg {
     // unused _config_index: only to implement MessageI
