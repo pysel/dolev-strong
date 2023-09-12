@@ -129,7 +129,7 @@ impl Config {
         Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
 
-    pub fn get_round_leader(&self) -> Option<Peer> {
+    pub fn get_stage_leader(&self) -> Option<Peer> {
         if self.mode() == Mode::LEADER {
             return None
         }

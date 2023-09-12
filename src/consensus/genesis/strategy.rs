@@ -4,5 +4,5 @@ pub mod follower;
 pub mod leader;
 
 pub trait GenesisStrategy {
-    fn genesis_round(&self, self_node: &ConsensusNode);
+    fn genesis_stage(&self, self_node: &ConsensusNode);
 }

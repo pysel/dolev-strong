@@ -5,18 +5,20 @@ use crate::consensus::ConsensusNode;
 pub struct FollowerStrategy;
 
 impl GenesisStrategy for FollowerStrategy {
-    fn genesis_round(&self, self_node: &ConsensusNode) {
-        self_node.rwait(0); // Round zero: allow leader to send out a value proposal.
+    fn genesis_stage(&self, self_node: &ConsensusNode) {
+        self_node.rwait(0); // stage zero: allow leader to send out a value proposal.
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
-        let received_message = match self_node.communication.receive_proposal(self_node.round_leader.unwrap()) {
+        let received_message = match self_node.communication.receive_proposal(self_node.stage_leader.unwrap()) {
             Ok(msg) => msg,
             Err(e) => panic!("failed to receive proposal message with error: {e}"), // TODO: Default Value
         };
 
         if !received_message.convincing() {
-            panic!("received proposal is not convincing") // TODO: Default Value
+            panic!("received proposal is not convincing") // TODO: Output null value - sender is Byzantine
         }
+
+        
     }
 }

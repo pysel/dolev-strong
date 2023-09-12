@@ -6,12 +6,13 @@ use self::sync::{Synchrony, new_synchrony};
 
 pub mod genesis;
 pub mod sync;
+mod protocol;
 
 pub struct ConsensusNode<'a> {
     pub communication: Communication,
     pub genesis_strategy: Option<&'a dyn GenesisStrategy>,
     self_is_leader: bool,
-    round_leader: Option<Peer>,
+    stage_leader: Option<Peer>,
     synchrony: Synchrony, // will be used for synchrony
 }
 
@@ -21,7 +22,7 @@ impl<'a> ConsensusNode<'a> {
         let mut communication: Communication = communication::new_node(keypair, config_index, path_to_config_file);
         communication.setup(); // setup communications
 
-        let (round_leader, self_is_leader) = match communication.get_round_leader() {
+        let (stage_leader, self_is_leader) = match communication.get_stage_leader() {
             Some(peer) => (Some(peer), false),
             None => (None, true)
         };
@@ -34,7 +35,7 @@ impl<'a> ConsensusNode<'a> {
             communication, 
             genesis_strategy: None, 
             self_is_leader, 
-            round_leader, 
+            stage_leader, 
             synchrony, 
         };
         consensus_node.setup_genesis_strategy(); // set genesis strategy for this node
@@ -52,11 +53,11 @@ impl<'a> ConsensusNode<'a> {
 
     pub fn launch(&self) {
         if let Some(strategy) = self.genesis_strategy {
-            strategy.genesis_round(self);
+            strategy.genesis_stage(self);
         } else {
             panic!("trying to launch a node without specifying it's genesis strategy")
         }
 
-        
+
     }
 }

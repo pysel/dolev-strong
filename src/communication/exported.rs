@@ -7,7 +7,7 @@ impl super::Communication {
         self.config.mode()
     }
 
-    pub fn get_round_leader(&self) -> Option<Peer> {
-        self.config.get_round_leader()
+    pub fn get_stage_leader(&self) -> Option<Peer> {
+        self.config.get_stage_leader()
     }
 }
