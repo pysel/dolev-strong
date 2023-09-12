@@ -21,9 +21,9 @@ impl Synchrony {
         self.bootstrap_ts + self.genesis_delta
     }
 
-    // rwait waits until the global beginning of stage r. See SPEC.md for details.
-    pub fn rwait(&self, r: i64) {
-        let desired_timestamp = self.get_genesis_stage_ts() + (PROTOCOL_DELTA * r) as u64;
+    // swait waits until the global beginning of stage s. See SPEC.md for details.
+    pub fn swait(&self, s: i64) {
+        let desired_timestamp = self.get_genesis_stage_ts() + (PROTOCOL_DELTA * s) as u64;
         if get_current_timestamp() >= desired_timestamp {
             panic!("waiting for stage that already started")
         }

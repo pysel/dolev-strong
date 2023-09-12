@@ -47,8 +47,8 @@ impl<'a> ConsensusNode<'a> {
         self.genesis_strategy = Some(strategy);
     }
 
-    fn rwait(&self, r: i64) {
-        self.synchrony.rwait(r)
+    fn swait(&self, r: i64) {
+        self.synchrony.swait(r)
     }
 
     pub fn launch(&self) {

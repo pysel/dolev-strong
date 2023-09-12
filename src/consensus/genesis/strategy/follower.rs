@@ -6,7 +6,7 @@ pub struct FollowerStrategy;
 
 impl GenesisStrategy for FollowerStrategy {
     fn genesis_stage(&self, self_node: &ConsensusNode) {
-        self_node.rwait(0); // stage zero: allow leader to send out a value proposal.
+        self_node.swait(0); // stage zero: allow leader to send out a value proposal.
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
