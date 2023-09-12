@@ -1,6 +1,6 @@
 use std::io::{Error, ErrorKind};
 
-use ed25519_dalek::{Signer, PublicKey};
+use ed25519_dalek::Signer;
 
 use crate::{communication::message::{MessageI, ConsensusMsg, types::consensus::{MSG_TYPE_CON, ConsensusMsgReceived, new_consensus_msg_received}, Value}, utils::message::bz_to_value};
 
