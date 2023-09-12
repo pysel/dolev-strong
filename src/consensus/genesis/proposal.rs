@@ -4,7 +4,7 @@ use crate::communication::{Communication, message::{types::propose::{ProposalMsg
 
 impl Communication {
     pub fn receive_proposal(&self, leader: Peer) -> Result<ProposalMsgReceived, Error> {
-        let mut stream: &TcpStream = self.config.get_tcp_stream(leader, false)
+        let mut stream: &TcpStream = self.config.get_listen_tcp_stream(leader)
             .expect(&format!("TcpStream does not exist with Peer {:?}", leader));
         let mut buf: SignedProposeBzType = [0; 67];
 

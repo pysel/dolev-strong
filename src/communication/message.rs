@@ -16,7 +16,7 @@ pub trait ReceivedMessageI {
 }
 
 // A binary value all honest nodes must agree on
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Value {
     Zero,
     One,
@@ -30,6 +30,7 @@ pub fn new_consensus_msg(value: Value, signatures: Vec<Signature>) -> ConsensusM
     ConsensusMsg { value, signatures }
 }
 
+#[derive(Clone, Debug)]
 pub struct ProposeMsg(Value);
 pub fn new_propose_msg(value: Value) -> ProposeMsg {
     ProposeMsg(value)

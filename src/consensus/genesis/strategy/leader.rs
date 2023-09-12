@@ -13,6 +13,9 @@ impl GenesisStrategy for LeaderStrategy {
         let proposal_message: &ProposeMsg = &new_propose_msg(proposal_value);
 
         self_node.communication.broadcast_message(proposal_message);
+
+        println!("{:?}", proposal_message);
+        self_node.swait(10);
     }
 }
 

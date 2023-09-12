@@ -144,7 +144,7 @@ impl communication::Communication {
 
     // send_message sends message to a peer
     pub fn send_message(&self, recepient: Peer, msg: &dyn MessageI) -> Option<Error> {
-        match self.config.get_tcp_stream(recepient, true) {
+        match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
                 // println!("Writing to peer: {:?} || local address: {:?} || index: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index());
 

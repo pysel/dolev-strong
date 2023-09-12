@@ -11,7 +11,7 @@ run-nd:
 	@echo
 	@echo Launching peer...
 	@echo
-	@cargo run $(CURDIR)/config.txt 1 ${CURTIME}  > /dev/null
+	@cargo run $(CURDIR)/config.txt 1 ${CURTIME}  > ./peer-log.txt
 
 run-mult: run-default run-nd
 

@@ -6,10 +6,10 @@ use super::Mode;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Peer {
-    pub socket: SocketAddr,
+    pub socket: SocketAddr, // a socket at which this peer is listening to incoming messages
     pub mode: Option<Mode>,
     pub pubkey: Option<PublicKey>,
-    peer_write_socket: Option<SocketAddr>
+    pub peer_write_socket: Option<SocketAddr> // a socket from which to expect receiving messages from this peer
 }
 
 pub fn new_peer(socket: SocketAddr, pubkey: Option<PublicKey>, mode: Option<Mode>, peer_write_socket: Option<SocketAddr>) -> Peer {

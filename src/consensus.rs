@@ -29,8 +29,6 @@ impl<'a> ConsensusNode<'a> {
 
         let synchrony: Synchrony = new_synchrony(bootstrap_timestamp);
 
-        println!("{:?}", synchrony);
-
         let mut consensus_node: ConsensusNode<'_> = ConsensusNode{
             communication, 
             genesis_strategy: None, 

@@ -19,6 +19,7 @@ impl GenesisStrategy for FollowerStrategy {
             panic!("received proposal is not convincing") // TODO: Output null value - sender is Byzantine
         }
 
-        
+        println!("{:?}", received_message);
+        self_node.swait(10);
     }
 }

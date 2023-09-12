@@ -6,7 +6,7 @@ pub const MSG_TYPE_PROP: &str = "pr";
 
 pub type SignedProposeBzType = [u8; 67];
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ProposalMsgReceived {
     proposed_value: Value,
     bytes: SignedProposeBzType,
