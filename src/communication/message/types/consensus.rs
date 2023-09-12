@@ -4,6 +4,7 @@ use crate::communication::message::{Value, ReceivedMessageI};
 
 pub const MSG_TYPE_CON: &str = "cm";
 
+#[derive(Clone, Debug)]
 pub struct ConsensusMsgReceived { // TODO: consider merging consensus message with proposal message
     proposed_value: Value,
     bytes: Vec<u8>,

@@ -22,6 +22,12 @@ pub enum Value {
     One,
 }
 
+impl Value {
+    pub fn get_serialized_size() -> usize {
+        1 // since it is either 1 or 0
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ConsensusMsg { 
     value: Value,

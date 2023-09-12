@@ -5,12 +5,15 @@ pub const GENESIS_TIMESTAMP_DELTA: u64 = 5; // time allocated for communication 
 
 #[derive(Debug)]
 pub struct Synchrony {
+    current_stage: i64,
     bootstrap_ts: u64,
     genesis_delta: u64,
 }
 
 pub fn new_synchrony(bootstrap_ts: u64) -> Synchrony {
-    Synchrony { bootstrap_ts, 
+    Synchrony { 
+        current_stage: -1,
+        bootstrap_ts, 
         genesis_delta: GENESIS_TIMESTAMP_DELTA 
     }
 }
@@ -22,7 +25,7 @@ impl Synchrony {
     }
 
     // swait waits until the global beginning of stage s. See SPEC.md for details.
-    pub fn swait(&self, s: i64) {
+    pub fn swait(&mut self, s: i64) {
         let desired_timestamp = self.get_genesis_stage_ts() + (PROTOCOL_DELTA * s) as u64;
         if get_current_timestamp() >= desired_timestamp {
             panic!("waiting for stage that already started")
@@ -33,6 +36,19 @@ impl Synchrony {
                 break;
             }
         }
+        self.set_current_stage(s)
+    }
+
+    fn set_current_stage(&mut self, s: i64) {
+        if s < self.current_stage {
+            panic!("cannot set stage that is less than current stage")
+        }
+
+        self.current_stage = s;
+    } 
+
+    pub fn get_current_stage(&self) -> i64 {
+        self.current_stage
     }
 }
 

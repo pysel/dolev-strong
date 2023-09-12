@@ -7,6 +7,7 @@ use self::sync::{Synchrony, new_synchrony};
 pub mod genesis;
 pub mod sync;
 pub mod protocol;
+mod errors;
 
 pub struct ConsensusNode<'a> {
     pub communication: Communication,
@@ -45,7 +46,7 @@ impl<'a> ConsensusNode<'a> {
         self.genesis_strategy = Some(strategy);
     }
 
-    fn swait(&self, r: i64) {
+    fn swait(&mut self, r: i64) {
         self.synchrony.swait(r)
     }
 
