@@ -1,5 +1,5 @@
 use super::GenesisStrategy;
-use crate::communication::message::{ReceivedMessageI, ConsensusMsg};
+use crate::communication::message::ConsensusMsg;
 use crate::consensus::ConsensusNode;
 
 pub struct FollowerStrategy;
@@ -23,7 +23,7 @@ impl GenesisStrategy for FollowerStrategy {
 
         println!("Received convincing proposal, broadcasting: {:?}", consensus_message);
         self_node.communication.broadcast_message(&consensus_message);
-        
+
         self_node.enter_stage(1);
     }
 }

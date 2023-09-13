@@ -11,7 +11,6 @@ pub trait MessageI {
 }
 
 pub trait ReceivedMessageI {
-    fn convincing(&self) -> bool; // asserts that provided signature(s) is(are) valid
     fn as_any(&self) -> &dyn Any; // required for downcasting
 }
 

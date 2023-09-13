@@ -24,21 +24,6 @@ pub fn new_proposal_msg_received(
 }
 
 impl ReceivedMessageI for ProposalMsgReceived {
-    fn convincing(&self) -> bool { // TODO!: add check that sender is actually a leader
-        let bz_to_check: &[u8] = &self.bytes[..3];
-        let sender_pubkey: PublicKey = self.sender_pubkey.expect("set sender pubkey before trying to validate message's signature");
-
-        if self.signatures.len() != 1 {
-            return false;
-        }
-
-        let signature_to_check = &self.signatures[0];
-        if let Ok(_) = sender_pubkey.verify(bz_to_check, signature_to_check) {
-            return true
-        }
-        false
-    }
-
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -53,5 +38,20 @@ impl ProposalMsgReceived {
         }
 
         new_consensus_msg(self.proposed_value, self.signatures)
+    }
+
+    pub fn convincing(&self) -> bool { // TODO!: add check that sender is actually a leader
+        let bz_to_check: &[u8] = &self.bytes[..3];
+        let sender_pubkey: PublicKey = self.sender_pubkey.expect("set sender pubkey before trying to validate message's signature");
+
+        if self.signatures.len() != 1 {
+            return false;
+        }
+
+        let signature_to_check = &self.signatures[0];
+        if let Ok(_) = sender_pubkey.verify(bz_to_check, signature_to_check) {
+            return true
+        }
+        false
     }
 }

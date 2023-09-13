@@ -1,5 +1,5 @@
 use std::any::Any;
-use ed25519_dalek::{PublicKey, Signature, Verifier};
+use ed25519_dalek::{PublicKey, Signature};
 use crate::communication::message::ReceivedMessageI;
 
 pub const MSG_TYPE_PB: &str = "pb";
@@ -15,15 +15,6 @@ pub struct PubkeyBroadcastMsgReceived {
 }
 
 impl ReceivedMessageI for PubkeyBroadcastMsgReceived {
-    fn convincing(&self) -> bool {
-        let bz_to_check: &[u8] = &self.bytes[..38];
-        if let Ok(_) = self.pubkey.verify(bz_to_check, &self.signature) {
-            return true
-        }
-        
-        false
-    }
-
     fn as_any(&self) -> &dyn Any {
         self
     }
