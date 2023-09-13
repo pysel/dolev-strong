@@ -4,14 +4,14 @@ use crate::communication::message::serde::deserealize;
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
 
-use self::types::ConsensusMsgReceivedTuple;
+use self::convincing::ConsensusMsgReceivedTuple;
 use self::utils::current_cons_msg_size;
 
 use super::ConsensusNode;
 use super::errors::MessageError;
 
 pub(crate) mod utils;
-pub(crate) mod types;
+pub(crate) mod convincing;
 
 // F is the upper bound on the number of Byzantine nodes this protocol tolerates. Alias for the number of stages required. See SPEC.md for details
 // TODO: make dynamic

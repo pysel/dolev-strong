@@ -1,6 +1,6 @@
 use std::any::Any;
 use ed25519_dalek::{Signature, PublicKey, Verifier};
-use crate::communication::message::{Value, ReceivedMessageI, ConsensusMsg, new_consensus_msg};
+use crate::communication::{message::{Value, ReceivedMessageI, ConsensusMsg, new_consensus_msg}, pki::is_valid_signature};
 
 pub const MSG_TYPE_PROP: &str = "pr";
 
@@ -49,9 +49,10 @@ impl ProposalMsgReceived {
         }
 
         let signature_to_check = &self.signatures[0];
-        if let Ok(_) = sender_pubkey.verify(bz_to_check, signature_to_check) {
-            return true
+        if !is_valid_signature(&bz_to_check.to_vec(), &sender_pubkey, signature_to_check) {
+            return false
         }
-        false
+        
+        true
     }
 }

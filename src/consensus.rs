@@ -1,3 +1,4 @@
+use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
 use crate::communication::{Communication, self};
 use crate::utils;
@@ -15,6 +16,7 @@ pub struct ConsensusNode<'a> {
     self_is_leader: bool,
     stage_leader: Option<Peer>,
     synchrony: Synchrony, // will be used for synchrony
+    convincing_messages: Vec<ConsensusMsgReceived>, // at the end of the protocol, all proposed values here should be the same 
 }
 
 impl<'a> ConsensusNode<'a> {
@@ -36,6 +38,7 @@ impl<'a> ConsensusNode<'a> {
             self_is_leader, 
             stage_leader, 
             synchrony, 
+            convincing_messages: vec![], // empty in the beginning 
         };
         consensus_node.setup_genesis_strategy(); // set genesis strategy for this node
 

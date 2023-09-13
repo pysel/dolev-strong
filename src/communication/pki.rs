@@ -1,5 +1,7 @@
 use std::{thread::sleep, time::Duration};
 
+use ed25519_dalek::{PublicKey, Signature, Verifier};
+
 // PKI - public key infrastructure (trusted setup assumption)
 use super::Communication;
 use crate::communication::message::{new_pk_broadcast_msg, PubkeyBroadcastMsg};
@@ -22,4 +24,11 @@ impl Communication {
             panic!("{e}");
         }
     }
+}
+
+pub fn is_valid_signature(bz: &Vec<u8>, pubkey: &PublicKey, sig: &Signature) -> bool {
+    if let Ok(_) = pubkey.verify(bz, sig) {
+        return true
+    }
+    false
 }

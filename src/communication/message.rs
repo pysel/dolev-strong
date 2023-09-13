@@ -22,7 +22,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn get_serialized_size() -> usize {
+    pub const fn get_serialized_size() -> usize {
         1 // since it is either 1 or 0
     }
 }
