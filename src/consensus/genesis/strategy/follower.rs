@@ -20,8 +20,10 @@ impl GenesisStrategy for FollowerStrategy {
         }
 
         let consensus_message: ConsensusMsg = received_message.convert_to_consensus_message();
-        self_node.communication.broadcast_message(&consensus_message);
+
         println!("Received convincing proposal, broadcasting: {:?}", consensus_message);
+        self_node.communication.broadcast_message(&consensus_message);
+        
         self_node.enter_stage(1);
     }
 }

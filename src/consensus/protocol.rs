@@ -20,6 +20,7 @@ const F: i64 = 5;
 impl ConsensusNode<'_> {
     // enter_stage is used for a node to enter to stage X of consensus
     pub fn enter_stage(mut self, stage: i64) {
+        println!("Entering stage {}", stage);
         if stage > F {
             panic!("maximum number of stages is {}, trying to enter bigger stage {}", F, stage)
         }
@@ -35,10 +36,9 @@ impl ConsensusNode<'_> {
     fn receive_consensus_message(&self, peer: Peer) -> Result<ConsensusMsgReceived, MessageError> {
         let mut stream: &TcpStream = self.communication.config.get_listen_tcp_stream(peer)
             .expect(&format!("TcpStream does not exist with Peer {:?}", peer));
-
         let current_stage = self.synchrony.get_current_stage();
         let current_msg_size = current_cons_msg_size(current_stage);
-        let mut buf: Vec<u8> = vec![];
+        let mut buf: Vec<u8> = vec![0u8; current_msg_size];
 
         match stream.read_exact(&mut buf) {
             Err(e) => {
