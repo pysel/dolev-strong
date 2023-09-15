@@ -1,6 +1,6 @@
 use ed25519_dalek::{Signature, PublicKey};
 
-use crate::communication::{message::{Value, ReceivedMessageI}, peer::{Peer, sanity::no_duplicate_peers}, pki::is_valid_signature};
+use crate::communication::{message::{Value, ReceivedMessageI, ConsensusMsg}, peer::{Peer, sanity::no_duplicate_pubkeys}, pki::is_valid_signature};
 
 pub const MSG_TYPE_CON: &str = "cm";
 const PAYLOAD_SIZE: usize = MSG_TYPE_CON.as_bytes().len() + Value::get_serialized_size();
@@ -36,7 +36,7 @@ impl ConsensusMsgReceived {
 
     // check_intermediary_signers asserts that intermediary signatures are valid (all signatures between first and last)
     // it checks that every signature is valid, and that every signature comes from distinct signer
-    pub fn check_intermediary_signers(&self, sender: &Peer, leader: &Peer, peers: &Vec<Peer>) -> bool {
+    pub fn check_intermediary_signers(&self, sender_pub: &PublicKey, leader_pub: &PublicKey, peers: &Vec<Peer>) -> bool {
         let sigs_amount = self.signatures.len();
         if sigs_amount < 3 {
             // if there are no other signers other from sender and leader (should be stage 2), return true since it is a valid message
@@ -44,28 +44,29 @@ impl ConsensusMsgReceived {
         }
 
         // seen_peers is used to avoid a message having multiple signatures created by the same sybil
-        let mut seen_peers = vec![sender, leader];
+        let mut seen_pubkeys = vec![sender_pub.clone(), leader_pub.clone()];
         for i in 1..sigs_amount-2 {
             let signature = &self.signatures[i];
             let bytes_signed = &self.raw_with_x_signatures(i.try_into().unwrap());
             if let Some(peer) = signature_belongs_to(signature, bytes_signed, peers) {
-                seen_peers.push(peer);
+                seen_pubkeys.push(peer.pubkey.unwrap());
             }
         }
 
         // if total peers seen is the amount of signatures in a message and there are no duplicates, a signatures verification passes
-        if seen_peers.len() == sigs_amount && no_duplicate_peers(&seen_peers) {
+        if seen_pubkeys.len() == sigs_amount && no_duplicate_pubkeys(&seen_pubkeys) {
             return true
         }
 
         false
     }
 
-    // pub fn signed_by(&self, peer: Peer) -> bool {
-    //     let signed_bytes = &self.bytes;
-    //     if !is_valid_signature(signed_bytes, peer.pubkey, sig);
-    //     unimplemented!()
-    // }
+    // append_signature_and_prepare converts ConsensusMsgReceived to ConsensusMsg with this node's appended signature
+    // used when a node finds a convincing message at some stage and wants to notify it's peers 
+    pub fn append_signature_and_prepare(&self) -> ConsensusMsg {
+        
+        unimplemented!()
+    }
 }
 
 // signature_belongs_to finds a peer to whom a signature belongs

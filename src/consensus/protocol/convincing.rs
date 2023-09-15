@@ -1,24 +1,31 @@
-use crate::communication::{peer::Peer, message::types::consensus::ConsensusMsgReceived, pki::is_valid_signature};
+use crate::{communication::{peer::Peer, message::types::consensus::ConsensusMsgReceived, pki::is_valid_signature}, consensus::ConsensusNode};
 
 #[derive(Debug)]
 pub struct ConsensusMsgReceivedTuple(pub Peer, pub Option<ConsensusMsgReceived>);
 
 impl ConsensusMsgReceivedTuple {
-    fn convincing(&self, s: i64, stage_leader: &Peer, peers: &Vec<Peer>) -> bool {
+    pub fn convincing(&self, cnode: &ConsensusNode) -> bool {
         let msg = match &self.1 {
             Some(msg) => msg,
             None => return false,
         };
 
+        let cur_stage = cnode.synchrony.get_current_stage();
+        let leader_pubkey = match cnode.self_is_leader {
+            true => {&cnode.communication.get_pubkey()},
+            false => {&cnode.communication.get_stage_leader().unwrap().pubkey.unwrap()},
+        };
+
         // convincing prerequisite: number of signatures should be equal to stage number
-        if msg.signatures.len() != s.try_into().unwrap() {
+        if msg.signatures.len() != cur_stage.try_into().unwrap() {
             return false
         }
 
         let bytes_signed_by_stage_leader = &msg.raw_with_x_signatures(1);
 
-        // convincing prerequisite: first signature should come from leader
-        if !is_valid_signature(bytes_signed_by_stage_leader, &stage_leader.pubkey.expect("pubkey not set for stage's leader"), &msg.signatures[0]) {
+        // let leader_signature = match self.
+        // convincing prerequisite: first signature should come from a leader
+        if !is_valid_signature(bytes_signed_by_stage_leader, leader_pubkey, &msg.signatures[0]) {
             return false
         }
 
@@ -31,8 +38,9 @@ impl ConsensusMsgReceivedTuple {
         }
 
         let msg_sender = &self.0;
+        let peers = &cnode.communication.config.peers();
         // intermediate signatures should also be valid
-        if !msg.check_intermediary_signers(msg_sender, stage_leader, peers) {
+        if !msg.check_intermediary_signers(&sender_pubkey, leader_pubkey, peers) {
             return false
         }
 

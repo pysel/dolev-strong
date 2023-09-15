@@ -1,4 +1,4 @@
-use ed25519_dalek::Keypair;
+use ed25519_dalek::{Keypair, PublicKey};
 use crate::utils::fs::parse_config_from_file;
 
 mod network;
@@ -28,3 +28,9 @@ pub fn new_node(keypair: Keypair, config_index: i32, path_to_config_file: String
     };
     node
 } 
+
+impl Communication {
+    pub fn get_pubkey(&self) -> PublicKey {
+        self.keypair.public
+    }
+}

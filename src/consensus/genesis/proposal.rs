@@ -3,7 +3,7 @@ use std::{io::{Error, Read}, net::TcpStream};
 use crate::communication::{Communication, message::{types::propose::{ProposalMsgReceived, SignedProposeBzType}, serde::deserealize}, peer::Peer};
 
 impl Communication {
-    pub fn receive_proposal(&self, leader: Peer) -> Result<ProposalMsgReceived, Error> {
+    pub fn receive_proposal(&self, leader: &Peer) -> Result<ProposalMsgReceived, Error> {
         let mut stream: &TcpStream = self.config.get_listen_tcp_stream(leader)
             .expect(&format!("TcpStream does not exist with leader {:?}", leader));
         let mut buf: SignedProposeBzType = [0; 67];

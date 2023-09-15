@@ -28,12 +28,20 @@ impl ConsensusNode<'_> {
         // wait until the beginning of a stage
         self.swait(stage);
 
-        let pending_messages = self.receive_all_consensus_messages();
+        let pending_messages = &self.receive_all_consensus_messages();
+
+        for pending_message in pending_messages {
+            // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
+            if pending_message.convincing(&self) {
+                // add a signature to this message
+
+            }
+        }
         println!("pending messages: {:?}", pending_messages)
     }
 
     // receive_consensus_message receives consensus message from a peer
-    fn receive_consensus_message(&self, peer: Peer) -> Result<ConsensusMsgReceived, MessageError> {
+    fn receive_consensus_message(&self, peer: &Peer) -> Result<ConsensusMsgReceived, MessageError> {
         let mut stream: &TcpStream = self.communication.config.get_listen_tcp_stream(peer)
             .expect(&format!("TcpStream does not exist with Peer {:?}", peer));
         let current_stage = self.synchrony.get_current_stage();
@@ -76,7 +84,7 @@ impl ConsensusNode<'_> {
     fn receive_all_consensus_messages(&self) -> Vec<ConsensusMsgReceivedTuple> {
         let mut result: Vec<ConsensusMsgReceivedTuple> = vec![];
         for peer in self.communication.config.peers() {
-            match self.receive_consensus_message(peer) {
+            match self.receive_consensus_message(&peer) {
                 Ok(cmsg) => {
                     result.push(ConsensusMsgReceivedTuple(peer, Some(cmsg)))
                 },

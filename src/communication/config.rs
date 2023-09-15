@@ -84,7 +84,7 @@ impl Config {
     }
 
     // get_listen_tcp_stream fetches a TcpStream on which this node listens to peer "peer"
-    pub fn get_listen_tcp_stream(&self, peer: Peer) -> Result<&TcpStream, Error> {
+    pub fn get_listen_tcp_stream(&self, peer: &Peer) -> Result<&TcpStream, Error> {
         if let Some(streams) = &self.listen_streams {
             for conn in streams {
                 if conn.peer_addr().expect("Failed to get peer's address") == peer.peer_write_socket.expect("trying to fetch peer's listen connection w/o setting peer's write socket") {
@@ -134,14 +134,14 @@ impl Config {
         Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
 
-    pub fn get_stage_leader(&self) -> Option<Peer> {
+    pub fn get_stage_leader(&self) -> Option<&Peer> {
         if self.mode() == Mode::LEADER {
             return None
         }
         
         for peer in self.peers() {
             if peer.mode.unwrap() == Mode::LEADER {
-                return Some(peer)
+                return Some(&peer)
             }
         }  
         
