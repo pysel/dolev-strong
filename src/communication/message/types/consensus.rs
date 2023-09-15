@@ -1,6 +1,6 @@
 use ed25519_dalek::{Signature, PublicKey};
 
-use crate::communication::{message::{Value, ReceivedMessageI}, peer::Peer, pki::is_valid_signature};
+use crate::communication::{message::{Value, ReceivedMessageI}, peer::{Peer, sanity::no_duplicate_peers}, pki::is_valid_signature};
 
 pub const MSG_TYPE_CON: &str = "cm";
 const PAYLOAD_SIZE: usize = MSG_TYPE_CON.as_bytes().len() + Value::get_serialized_size();
@@ -25,13 +25,40 @@ impl ReceivedMessageI for ConsensusMsgReceived {
 
 impl ConsensusMsgReceived {
     // raw_with_x_signatures returns this consensus message in byte form only with x first signatures
-    fn raw_with_x_signatures(&self, x: i64) -> Vec<u8> {
+    pub fn raw_with_x_signatures(&self, x: i64) -> Vec<u8> {
         let mut payload = self.bytes[..PAYLOAD_SIZE].to_vec();
         let mut signatures = self.bytes[PAYLOAD_SIZE..PAYLOAD_SIZE + Signature::BYTE_SIZE * x as usize].to_vec();
         let mut result = vec![];
         result.append(&mut payload);
         result.append(&mut signatures);
         result
+    }
+
+    // check_intermediary_signers asserts that intermediary signatures are valid (all signatures between first and last)
+    // it checks that every signature is valid, and that every signature comes from distinct signer
+    pub fn check_intermediary_signers(&self, sender: &Peer, leader: &Peer, peers: &Vec<Peer>) -> bool {
+        let sigs_amount = self.signatures.len();
+        if sigs_amount < 3 {
+            // if there are no other signers other from sender and leader (should be stage 2), return true since it is a valid message
+            return true
+        }
+
+        // seen_peers is used to avoid a message having multiple signatures created by the same sybil
+        let mut seen_peers = vec![sender, leader];
+        for i in 1..sigs_amount-2 {
+            let signature = &self.signatures[i];
+            let bytes_signed = &self.raw_with_x_signatures(i.try_into().unwrap());
+            if let Some(peer) = signature_belongs_to(signature, bytes_signed, peers) {
+                seen_peers.push(peer);
+            }
+        }
+
+        // if total peers seen is the amount of signatures in a message and there are no duplicates, a signatures verification passes
+        if seen_peers.len() == sigs_amount && no_duplicate_peers(&seen_peers) {
+            return true
+        }
+
+        false
     }
 
     // pub fn signed_by(&self, peer: Peer) -> bool {
@@ -41,3 +68,12 @@ impl ConsensusMsgReceived {
     // }
 }
 
+// signature_belongs_to finds a peer to whom a signature belongs
+fn signature_belongs_to<'a>(signature: &Signature, bytes: &Vec<u8>, peers: &'a Vec<Peer>) -> Option<&'a Peer> {
+    for peer in peers {
+        if is_valid_signature(bytes, &peer.pubkey.expect(&format!("pubkey not set for peer {:?}", peer)), signature) {
+            return Some(peer)
+        }
+    }
+    None
+}

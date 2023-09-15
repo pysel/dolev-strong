@@ -1,5 +1,5 @@
 use std::any::Any;
-use ed25519_dalek::{Signature, PublicKey, Verifier};
+use ed25519_dalek::{Signature, PublicKey};
 use crate::communication::{message::{Value, ReceivedMessageI, ConsensusMsg, new_consensus_msg}, pki::is_valid_signature};
 
 pub const MSG_TYPE_PROP: &str = "pr";

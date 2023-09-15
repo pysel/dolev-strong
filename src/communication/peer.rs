@@ -4,6 +4,8 @@ use std::net::SocketAddr;
 
 use super::Mode;
 
+pub mod sanity;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Peer {
     pub socket: SocketAddr, // a socket at which this peer is listening to incoming messages
