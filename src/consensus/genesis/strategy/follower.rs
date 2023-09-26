@@ -10,7 +10,7 @@ impl GenesisStrategy for FollowerStrategy {
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
-        let received_message = match self_node.communication.receive_proposal(self_node.stage_leader.unwrap()) {
+        let received_message = match self_node.communication.receive_proposal(&self_node.stage_leader.unwrap()) {
             Ok(msg) => msg,
             Err(e) => panic!("failed to receive proposal message with error: {e}"), // TODO: Default Value
         };

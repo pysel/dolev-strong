@@ -83,7 +83,7 @@ impl ConsensusNode<'_> {
     // receive_all_consensus_messages tries to receive all consensus messages from all nodes
     fn receive_all_consensus_messages(&self) -> Vec<ConsensusMsgReceivedTuple> {
         let mut result: Vec<ConsensusMsgReceivedTuple> = vec![];
-        for peer in self.communication.config.peers() {
+        for peer in &self.communication.config.peers {
             match self.receive_consensus_message(&peer) {
                 Ok(cmsg) => {
                     result.push(ConsensusMsgReceivedTuple(peer, Some(cmsg)))

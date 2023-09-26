@@ -1,9 +1,9 @@
 use crate::{communication::{peer::Peer, message::types::consensus::ConsensusMsgReceived, pki::is_valid_signature}, consensus::ConsensusNode};
 
 #[derive(Debug)]
-pub struct ConsensusMsgReceivedTuple(pub Peer, pub Option<ConsensusMsgReceived>);
+pub struct ConsensusMsgReceivedTuple<'a>(pub &'a Peer, pub Option<ConsensusMsgReceived>);
 
-impl ConsensusMsgReceivedTuple {
+impl ConsensusMsgReceivedTuple<'_> {
     pub fn convincing(&self, cnode: &ConsensusNode) -> bool {
         let msg = match &self.1 {
             Some(msg) => msg,
@@ -12,8 +12,8 @@ impl ConsensusMsgReceivedTuple {
 
         let cur_stage = cnode.synchrony.get_current_stage();
         let leader_pubkey = match cnode.self_is_leader {
-            true => {&cnode.communication.get_pubkey()},
-            false => {&cnode.communication.get_stage_leader().unwrap().pubkey.unwrap()},
+            true => {cnode.communication.get_pubkey()},
+            false => {cnode.communication.get_stage_leader().unwrap().pubkey.unwrap()},
         };
 
         // convincing prerequisite: number of signatures should be equal to stage number
@@ -25,7 +25,7 @@ impl ConsensusMsgReceivedTuple {
 
         // let leader_signature = match self.
         // convincing prerequisite: first signature should come from a leader
-        if !is_valid_signature(bytes_signed_by_stage_leader, leader_pubkey, &msg.signatures[0]) {
+        if !is_valid_signature(bytes_signed_by_stage_leader, &leader_pubkey, &msg.signatures[0]) {
             return false
         }
 
@@ -38,12 +38,11 @@ impl ConsensusMsgReceivedTuple {
         }
 
         let msg_sender = &self.0;
-        let peers = &cnode.communication.config.peers();
+        let peers = &cnode.communication.config.peers;
         // intermediate signatures should also be valid
-        if !msg.check_intermediary_signers(&sender_pubkey, leader_pubkey, peers) {
+        if !msg.check_intermediary_signers(&sender_pubkey, &leader_pubkey, peers) {
             return false
         }
-
         true
     }
 }

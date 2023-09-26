@@ -14,7 +14,7 @@ pub struct ConsensusNode<'a> {
     pub communication: Communication,
     pub genesis_strategy: Option<&'a dyn GenesisStrategy>,
     self_is_leader: bool,
-    stage_leader: Option<&'a Peer>,
+    stage_leader: Option<Peer>,
     synchrony: Synchrony, // will be used for synchrony
     convincing_messages: Vec<ConsensusMsgReceived>, // at the end of the protocol, all proposed values here should be the same 
 }
@@ -32,7 +32,7 @@ impl<'a> ConsensusNode<'a> {
 
         let synchrony: Synchrony = new_synchrony(bootstrap_timestamp);
 
-        let mut consensus_node: ConsensusNode<'_> = ConsensusNode{
+        let mut consensus_node: ConsensusNode<'a> = ConsensusNode{
             communication, 
             genesis_strategy: None, 
             self_is_leader, 

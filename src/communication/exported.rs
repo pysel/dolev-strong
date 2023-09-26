@@ -9,14 +9,14 @@ impl super::Communication {
         self.config.mode()
     }
 
-    pub fn get_stage_leader(&self) -> Option<&Peer> {
+    pub fn get_stage_leader(&self) -> Option<Peer> {
         self.config.get_stage_leader()
     }
 
-    pub fn get_stage_leader_pubkey(&self) -> &PublicKey {
+    pub fn get_stage_leader_pubkey(&self) -> PublicKey {
         match self.get_stage_leader() {
-            Some(leader) => &leader.pubkey.unwrap(),
-            None => &self.get_pubkey()
+            Some(leader) => leader.pubkey.unwrap(),
+            None => self.get_pubkey()
         }
     }
 }

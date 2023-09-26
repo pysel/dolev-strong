@@ -12,10 +12,10 @@ use std::io::{Error, ErrorKind, Read};
 
 #[derive(Debug)]
 pub struct Config {
+    pub peers: Vec<Peer>,
     mode: Mode, // TODO: consider moving to ConsensusNode
     config_index: i32,
     config_file: String,
-    peers: Vec<Peer>,
     listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
@@ -55,9 +55,9 @@ impl Config {
     //     self.peers = peers
     // }
 
-    pub fn peers(&self) -> Vec<Peer> {
-        self.peers.clone()
-    }
+    // pub fn peers(&self) -> Vec<&Peer> {
+    //     self.peers.clone()
+    // }
 
     // pub fn set_mode(&mut self, mode: Mode) {
     //     self.mode = mode
@@ -72,7 +72,7 @@ impl Config {
     }
     
     // get_write_tcp_stream fetches a TcpStream to send message to peer 
-    pub fn get_write_tcp_stream(&self, peer: Peer) -> Result<&TcpStream, Error> {
+    pub fn get_write_tcp_stream(&self, peer: &Peer) -> Result<&TcpStream, Error> {
         if let Some(streams) = &self.write_streams {
             for conn in streams {
                 if conn.peer_addr().expect("Failed to get peer's address") == peer.socket {
@@ -134,14 +134,14 @@ impl Config {
         Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
 
-    pub fn get_stage_leader(&self) -> Option<&Peer> {
+    pub fn get_stage_leader(&self) -> Option<Peer> {
         if self.mode() == Mode::LEADER {
             return None
         }
         
-        for peer in self.peers() {
+        for peer in &self.peers {
             if peer.mode.unwrap() == Mode::LEADER {
-                return Some(&peer)
+                return Some(peer.clone())
             }
         }  
         

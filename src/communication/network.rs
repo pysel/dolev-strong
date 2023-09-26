@@ -34,10 +34,10 @@ impl communication::Communication {
         let (tx, rx) = mpsc::channel::<Streams>();
         let (tx_bind, tx_conn) = (tx.clone(), tx);
         
-        let peers: Vec<Peer> = self.config.peers();
+        let peers: Vec<Peer> = self.config.peers.clone();
         
         let listen_socket: SocketAddr = self.config.listen_socket();
-        let num_peers: usize = self.config.peers().len();
+        let num_peers: usize = self.config.peers.len();
 
         // run thread that waits for connections from other nodes
         thread::spawn(move || {
@@ -57,7 +57,7 @@ impl communication::Communication {
 
         // run thread that connect to other nodes
         thread::spawn(move || {
-            let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(peers);
+            let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(&peers);
             match streams {
                 Ok(streams) => {
                     tx_conn.send(
@@ -125,7 +125,7 @@ impl communication::Communication {
         Ok(streams)
     }
 
-    fn connect_until_success(peers: Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
+    fn connect_until_success(peers: &Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
         let start: Instant = Instant::now();
 
         loop {
@@ -142,7 +142,7 @@ impl communication::Communication {
     }
 
     // send_message sends message to a peer
-    pub fn send_message(&self, recepient: Peer, msg: &dyn MessageI) -> Option<Error> {
+    pub fn send_message(&self, recepient: &Peer, msg: &dyn MessageI) -> Option<Error> {
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
                 println!("Writing to peer: {:?} || local address: {:?} || index: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index());
@@ -177,7 +177,7 @@ impl communication::Communication {
 
     // broadcast_message sends message to all peers
     pub fn broadcast_message(&self, msg: &dyn MessageI) -> Option<Error>{
-        for peer in self.config.peers() {
+        for peer in &self.config.peers {
             // println!("Sending message to {:?}. Communication {}", peer.socket, self.config.config_index());
             if let Some(e) = self.send_message(peer, msg) {
                 return Some(Error::new(ErrorKind::Other, format!("Failed to send message to peer {:?} with error {}", peer.socket, e)))
