@@ -113,6 +113,7 @@ impl communication::Communication {
         for peer in peers {
             match TcpStream::connect(peer.socket.clone()) {
                 Ok(connection) => {
+                    connection.set_read_timeout(Some(Duration::new(0, 3000000)))?; // almost third of a second
                     streams.push(connection);
                 }
 

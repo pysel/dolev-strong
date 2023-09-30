@@ -7,6 +7,7 @@ use crate::{communication::message::{MessageI, ConsensusMsg, types::consensus::{
 pub(crate) mod utils;
 
 impl MessageI for ConsensusMsg {
+    // serialize serializes the message and signs it with this node's keypair
     fn serialize(&self, keypair: &ed25519_dalek::Keypair, _config_index: i32) -> Vec<u8> {
         let msg_type: &[u8] = MSG_TYPE_CON.as_bytes();
         let proposing_value: u8 = self.value.serialize();

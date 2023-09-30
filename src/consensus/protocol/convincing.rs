@@ -43,7 +43,6 @@ impl ConsensusMsgReceivedTuple<'_> {
         if !msg.check_intermediary_signers(&sender_pubkey, &leader_pubkey, peers) {
             return false
         }
-        println!("VALID");
         true
     }
 }
