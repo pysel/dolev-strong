@@ -1,11 +1,9 @@
 use crate::communication::Mode::{LEADER, FOLLOWER};
-
 use crate::consensus::genesis::strategy::{follower::FollowerStrategy, leader::LeaderStrategy};
 
 use super::ConsensusNode;
 
 pub mod strategy;
-mod proposal;
 
 impl ConsensusNode<'_> {
     pub fn setup_genesis_strategy(&mut self) {

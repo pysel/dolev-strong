@@ -59,7 +59,10 @@ impl<'a> ConsensusNode<'a> {
         } else {
             panic!("trying to launch a node without specifying it's genesis strategy")
         }
+    }
 
-
+    // current_stage fetches current round's stage from synchrony
+    pub fn current_stage(&self) -> i64 {
+        self.synchrony.get_current_stage()
     }
 }

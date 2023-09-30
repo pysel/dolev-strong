@@ -146,7 +146,7 @@ impl communication::Communication {
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
                 println!("Writing to peer: {:?} || local address: {:?} || index: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index());
-
+                // println!("Message to send: {:?}", &msg.serialize(&self.keypair, self.config.config_index()));
                 // attempt to write a message
                 match write_conn.write(&msg.serialize(&self.keypair, self.config.config_index())) {
                     Err(e) => {

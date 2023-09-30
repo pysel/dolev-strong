@@ -1,6 +1,5 @@
 use ed25519_dalek::PublicKey;
 
-use super::Peer;
 use std::collections::HashSet;
 
 

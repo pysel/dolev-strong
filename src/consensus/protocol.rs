@@ -29,7 +29,6 @@ impl ConsensusNode<'_> {
         self.swait(stage);
 
         let pending_messages = &self.receive_all_consensus_messages();
-
         for pending_message in pending_messages {
             // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
             if pending_message.convincing(&self) {
@@ -67,7 +66,8 @@ impl ConsensusNode<'_> {
 
         match deserealize(buf) {
             Ok(msg) => {
-                if let Some(consensus_msg) = msg.as_any().downcast_ref::<ConsensusMsgReceived>().cloned() {
+                if let Some(mut consensus_msg) = msg.as_any().downcast_ref::<ConsensusMsgReceived>().cloned() {
+                    consensus_msg.sender_pubkey = peer.pubkey;
                     return Ok(consensus_msg)
                 } else {
                     return Err(MessageError::ErrWrongBytes("Trying to deserialize not a ConsensusMessageReceived bytes"))
@@ -81,7 +81,7 @@ impl ConsensusNode<'_> {
     }
 
     // receive_all_consensus_messages tries to receive all consensus messages from all nodes
-    fn receive_all_consensus_messages(&self) -> Vec<ConsensusMsgReceivedTuple> {
+    pub fn receive_all_consensus_messages(&self) -> Vec<ConsensusMsgReceivedTuple> {
         let mut result: Vec<ConsensusMsgReceivedTuple> = vec![];
         for peer in &self.communication.config.peers {
             match self.receive_consensus_message(&peer) {

@@ -1,7 +1,6 @@
 
-use crate::{consensus::ConsensusNode, communication::message::{Value, new_propose_msg}};
+use crate::{consensus::ConsensusNode, communication::message::{Value, new_consensus_msg}};
 use super::GenesisStrategy;
-use crate::communication::message::ProposeMsg;
 
 pub struct LeaderStrategy;
 
@@ -10,7 +9,7 @@ impl GenesisStrategy for LeaderStrategy {
         if !self_node.self_is_leader { panic!("follower node has leader's strategy") } // sanity check
 
         let proposal_value: Value = random_proposal_value();
-        let proposal_message: &ProposeMsg = &new_propose_msg(proposal_value);
+        let proposal_message = &new_consensus_msg(proposal_value, vec![]);
 
         self_node.communication.broadcast_message(proposal_message);
 

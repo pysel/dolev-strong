@@ -61,11 +61,14 @@ impl ConsensusMsgReceived {
         false
     }
 
-    // append_signature_and_prepare converts ConsensusMsgReceived to ConsensusMsg with this node's appended signature
-    // used when a node finds a convincing message at some stage and wants to notify it's peers 
-    pub fn append_signature_and_prepare(&self) -> ConsensusMsg {
-        
-        unimplemented!()
+    // to_consensus_msg converts ConsensusMsgReceived to ConsensusMsg.
+    // used when a node finds a convincing message at some stage and wants to notify it's peers.
+    // should only be used when a message is convincing
+    pub fn to_consensus_msg(&self) -> ConsensusMsg {
+        ConsensusMsg { 
+            value: self.proposed_value.clone(), 
+            signatures: self.signatures.clone(),
+        }
     }
 }
 
