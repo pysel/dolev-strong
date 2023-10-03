@@ -61,7 +61,7 @@ impl<'a> ConsensusNode<'a> {
         }
     }
 
-    // current_stage fetches current round's stage from synchrony
+    // current_stage fetches current stage from synchrony
     pub fn current_stage(&self) -> i64 {
         self.synchrony.get_current_stage()
     }
