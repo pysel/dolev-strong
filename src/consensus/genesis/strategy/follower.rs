@@ -9,11 +9,14 @@ impl GenesisStrategy for FollowerStrategy {
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
-        let received_messages = self_node.receive_all_consensus_messages();
+        let received_messages: Vec<ConsensusMsgReceivedTuple<'_>> = self_node.receive_all_consensus_messages();
         println!("Received messages during genesis: {:?}", received_messages);
 
         // since the message is convincing, we can directly unwrap the received message
-        let consensus_msg = validate_messages_received_on_proposal(received_messages, &self_node);
+        let consensus_msg: ConsensusMsg = validate_messages_received_on_proposal(&received_messages, &self_node);
+
+        // convincing proposal is added to the list of convincing messages
+        self_node.convincing_messages.push(received_messages[0].clone().1.unwrap());
 
         println!("Received convincing proposal, broadcasting: {:?}", consensus_msg);
         self_node.communication.broadcast_message(&consensus_msg);
@@ -24,7 +27,7 @@ impl GenesisStrategy for FollowerStrategy {
 
 // validate_messages_received_on_proposal checks that the messages received on proposal stage are valid and returns the consensus message
 // to be broadcasted to peers if the proposal is convincing
-fn validate_messages_received_on_proposal(msgs: Vec<ConsensusMsgReceivedTuple>, cnode: &ConsensusNode) -> ConsensusMsg {
+fn validate_messages_received_on_proposal(msgs: &Vec<ConsensusMsgReceivedTuple>, cnode: &ConsensusNode) -> ConsensusMsg {
     // should only receive one message
     if msgs.len() != 1 {
         // TODO: this is a byzantine behavior, need to find a message that came from a leader, and discard others
