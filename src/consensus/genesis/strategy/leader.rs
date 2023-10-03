@@ -1,4 +1,6 @@
 
+use rand::Rng;
+
 use crate::{consensus::ConsensusNode, communication::message::{Value, new_consensus_msg}};
 use super::GenesisStrategy;
 
@@ -17,7 +19,11 @@ impl GenesisStrategy for LeaderStrategy {
     }
 }
 
-// TODO: make this actually random
 fn random_proposal_value() -> Value {
+    let num = rand::thread_rng().gen_bool(0.5);
+    if num {
+        return Value::One
+    }
+
     Value::Zero
 }
