@@ -15,10 +15,11 @@ pub trait ReceivedMessageI {
 }
 
 // A binary value all honest nodes must agree on
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     Zero,
     One,
+    DEFAULT,
 }
 
 impl Display for Value {
@@ -26,6 +27,7 @@ impl Display for Value {
         match self {
             Value::Zero => write!(f, "0"),
             Value::One => write!(f, "1"),
+            Value::DEFAULT => write!(f, "default"),
         }
     }
 }

@@ -51,6 +51,8 @@ pub fn deserealize_con(bz: Vec<u8>) -> Result<ConsensusMsgReceived, Error> {
 }
 
 mod tests{
+    #![allow(unused_imports)] // all imports are used, for some reason my IDE doesn't see it
+
     use ed25519_dalek::Signer;
 
     use crate::{communication::message::{new_consensus_msg, MessageI}, utils::crypto::gen_keypair};

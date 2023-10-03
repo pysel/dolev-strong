@@ -7,7 +7,7 @@ const PAYLOAD_SIZE: usize = MSG_TYPE_CON.as_bytes().len() + Value::get_serialize
 
 #[derive(Clone, Debug)]
 pub struct ConsensusMsgReceived { // TODO: consider merging consensus message with proposal message
-    proposed_value: Value,
+    pub proposed_value: Value,
     pub bytes: Vec<u8>,
     pub signatures: Vec<Signature>,
     pub sender_pubkey: Option<PublicKey>,

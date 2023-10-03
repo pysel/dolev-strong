@@ -1,4 +1,4 @@
-use crate::{communication::{peer::Peer, message::types::consensus::ConsensusMsgReceived, pki::is_valid_signature}, consensus::ConsensusNode};
+use crate::{communication::{peer::Peer, message::{types::consensus::ConsensusMsgReceived, Value}, pki::is_valid_signature}, consensus::ConsensusNode};
 
 #[derive(Debug, Clone)]
 pub struct ConsensusMsgReceivedTuple<'a>(pub &'a Peer, pub Option<ConsensusMsgReceived>);
@@ -45,4 +45,27 @@ impl ConsensusMsgReceivedTuple<'_> {
         }
         true
     }
+}
+
+// validate_convincing_messages is a final validation step of a protocol.
+// It checks that all messages in a vector have the same proposed value.
+// It returns a value to be returned based on the contents of the convincing messages.
+pub(crate) fn validate_convincing_messages(msgs: &Vec<ConsensusMsgReceived>) -> Value {
+    // if no convincing messages received, return default value
+    // signifies that a leader is Byzantine
+    if msgs.len() == 0 {
+        return Value::DEFAULT
+    }
+
+    // if there is at least one convincing message, check that all messages have the same proposed value
+    let base_value: &Value = &msgs[0].proposed_value;
+    for i in 0..msgs.len() {
+        let msg: &ConsensusMsgReceived = &msgs[i];
+        if msg.proposed_value != *base_value {
+            return Value::DEFAULT
+        }
+    }
+    
+    // if all values are equal to one another, should halt with this value
+    base_value.clone()
 }

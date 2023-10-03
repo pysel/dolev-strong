@@ -8,6 +8,7 @@ impl Value {
         match *self {
             Zero => 0,
             One => 1,
+            Value::DEFAULT => panic!("a default value should not be serialized"),
         }
     }
 }

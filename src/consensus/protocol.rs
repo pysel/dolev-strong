@@ -3,10 +3,11 @@ use std::io::{Read, Error, ErrorKind};
 use crate::communication::message::serde::deserealize;
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
+use crate::consensus::protocol::convincing::validate_convincing_messages;
 
 use self::convincing::ConsensusMsgReceivedTuple;
 use self::utils::current_cons_msg_size;
-use crate::communication::message::{ConsensusMsg, Value};
+use crate::communication::message::Value;
 
 use super::ConsensusNode;
 use super::errors::MessageError;
@@ -29,17 +30,18 @@ impl ConsensusNode<'_> {
         // wait until the beginning of a stage
         self.swait(stage);
         let pending_messages = &self.receive_all_consensus_messages();
-        let mut convincing_message: Option<ConsensusMsg> = None;
     
         for pending_message in pending_messages {
             // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
             if pending_message.convincing(&self) {
                 let convincing_message_rcvd: ConsensusMsgReceived = pending_message.1.clone().unwrap();
-                convincing_message = Some(convincing_message_rcvd.to_consensus_msg());
+                let convincing_message = convincing_message_rcvd.to_consensus_msg();
 
                 // message signing happens during broadcast, no need to explicitly sign here
-                println!("broadcasting message: {:?} on stage {}", convincing_message.clone().unwrap(), stage);
-                self.communication.broadcast_message(&convincing_message.clone().unwrap()); // cloning since we want to use the message later 
+                println!("broadcasting message: {:?} on stage {}", convincing_message.clone(), stage);
+                self.communication.broadcast_message(&convincing_message.clone()); // cloning since we want to use the message later 
+
+                self.convincing_messages.push(convincing_message_rcvd);
 
                 // it is possible that a node receives multiple convincing messages, but we only need one 
                 // to broadcast to peers, so we break here
@@ -47,14 +49,12 @@ impl ConsensusNode<'_> {
             }
         }
         
+        // check if it is time to halt
         if stage == F {
-            if convincing_message.is_none() {
-                // TODO: Output default value
-                panic!("no convincing message received at stage {}", stage)
-            } else {
-                self.halt(convincing_message.unwrap().value);
-                return
-            }
+            let halting_value = validate_convincing_messages(&self.convincing_messages);
+
+            self.halt(halting_value);
+            return
         }
 
         self.enter_stage(stage + 1)
