@@ -1,8 +1,7 @@
 use ed25519_dalek::{Keypair, PublicKey};
 use crate::utils::fs::parse_config_from_file;
 
-mod network;
-
+pub mod network;
 pub mod pki;
 pub mod message;
 pub mod peer;

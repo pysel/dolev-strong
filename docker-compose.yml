@@ -1,0 +1,34 @@
+# currently this is used for development purposes
+version: "3.8"
+
+services:
+  leader: 
+    image: "default_node"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: leader
+    ports: 
+      - "8000:8000"
+    environment:
+      CONFIG_INDEX: 0
+      CONFIG_PATH: "./config.txt"
+      BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+
+    volumes:
+      - /Users/ruslanakhtariev/github/dolev-strong:/protocol
+  follower:
+    image: "peer_node"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: follower
+    ports: 
+      - "8001:8001"
+    environment:
+      CONFIG_INDEX: 1
+      CONFIG_PATH: "./config.txt"
+      BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+
+    volumes:
+      - /Users/ruslanakhtariev/github/dolev-strong:/protocol

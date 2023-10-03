@@ -1,7 +1,10 @@
 use std::time::SystemTime;
 
 const PROTOCOL_DELTA: i64 = 2; // the bound on message delays
-pub const GENESIS_TIMESTAMP_DELTA: u64 = 5; // time allocated for communication setup / time before starting the process and starting initial stage
+
+// time allocated for communication setup / time before starting the process and starting initial stage
+// it takes 15 seconds because it is containerized
+pub const GENESIS_TIMESTAMP_DELTA: u64 = 10; 
 
 #[derive(Debug)]
 pub struct Synchrony {
@@ -27,6 +30,7 @@ impl Synchrony {
     // swait waits until the global beginning of stage s. See SPEC.md for details.
     pub fn swait(&mut self, s: i64) {
         let desired_timestamp = self.get_genesis_stage_ts() + (PROTOCOL_DELTA * s) as u64;
+        println!("current timestamp: {}, desired timestamp: {}", get_current_timestamp(), desired_timestamp);
         if get_current_timestamp() >= desired_timestamp {
             panic!("waiting for stage that already started")
         }
