@@ -1,9 +1,9 @@
 use std::env;
 
 use communication::network::docker::wait_until_containers_are_up;
+use consensus::ConsensusNode;
 
 mod communication;
-mod testutil;
 mod utils;
 mod consensus;
 
@@ -16,8 +16,12 @@ fn main() {
 
     // Docker hack
     wait_until_containers_are_up();
-    
-    testutil::run_node(config_index, peers_file, bootstrap_timestamp);
+
+    run_node(config_index, peers_file, bootstrap_timestamp);
 }
 
+fn run_node(config_index: i32, path_to_config_file: String, bootstrap_timestamp: u64) {
+    let consensus_node: ConsensusNode<'_> = ConsensusNode::new_consensus_node(config_index, path_to_config_file, bootstrap_timestamp);
+    consensus_node.launch();
+}
 
