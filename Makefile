@@ -29,3 +29,8 @@ up:
 	@echo
 	@BOOTSTRAPPING_TIME=${CURTIME} docker-compose up -d
 	@./scripts/start-services.sh 
+
+ckillall:
+	-@docker kill $(shell docker ps -q)
+
+cbu: ckillall build up

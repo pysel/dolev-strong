@@ -1,6 +1,6 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{Error, ErrorKind, Write};
-use std::thread;
+use std::thread::{self, sleep};
 use std::time::{Instant, Duration};
 use std::sync::mpsc;
 
@@ -43,7 +43,8 @@ impl communication::Communication {
         let num_peers: usize = self.config.peers.len();
 
         // run thread that waits for connections from other nodes
-        thread::spawn(move || {
+        println!("peers: {:?}", peers);
+        let listening_thread = thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
@@ -59,7 +60,7 @@ impl communication::Communication {
         });
 
         // run thread that connect to other nodes
-        thread::spawn(move || {
+        let writing_thread = thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(&peers);
             match streams {
                 Ok(streams) => {
@@ -73,16 +74,24 @@ impl communication::Communication {
                 }
             }
         });
+        println!("Connection threads are running!");
 
         for received in rx {
             if received.s_type == StreamType::LISTEN {
                 let listen_streams = received.streams;
+                println!("Received listen streams: {} || {:?}", listen_streams.len(), listen_streams);
                 self.config.set_listen_streams(listen_streams)
             } else {
                 let write_streams = received.streams;
+                println!("Received write streams: {} || {:?}", write_streams.len(), write_streams);
                 self.config.set_write_streams(write_streams)
             }
         }
+
+        writing_thread.join().unwrap();
+        listening_thread.join().unwrap();
+
+        println!("All connections established!")
     }
 
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
@@ -94,8 +103,8 @@ impl communication::Communication {
         loop { // wait until all peers are connected
             match listener.accept() {
                 Ok((stream, _)) => {
-                    peers.push(stream); // TODO: maybe add check if this is the accepted listener
-        
+                    println!("Accepted connection from port {:?}", stream.peer_addr().unwrap().port());
+                    peers.push(stream);
                     if peers.len() == num_peers.try_into().expect("Could not convert num_peers into i32") {
                         break;
                     }
@@ -114,6 +123,7 @@ impl communication::Communication {
     fn connect_to_peers(peers: &Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
         let mut streams: Vec<TcpStream> = Vec::new();
         for peer in peers {
+            println!("Connecting to peer {:?}...", peer.socket.tuple());
             match TcpStream::connect(peer.socket.tuple()) {
                 Ok(connection) => {
                     connection.set_read_timeout(Some(Duration::new(0, 3000000)))?; // almost third of a second
@@ -121,7 +131,7 @@ impl communication::Communication {
                 }
 
                 Err(e) => {
-                    return Err(Error::new(ErrorKind::NotConnected, format!("Failed to connect to peer {:?} with error {}", peer.socket.tuple(), e)));
+                    return Err(Error::new(ErrorKind::NotConnected, format!("Failed to connect to peer {:?} with error: {}", peer.socket.tuple(), e)));
                 }
             }
         }
@@ -138,7 +148,7 @@ impl communication::Communication {
                 return Ok(streams)
             }
 
-            if start.elapsed() > Duration::from_secs(10) {
+            if start.elapsed() > Duration::from_secs(20) {
                 let error = streams.unwrap_err();
                 break Err(Error::new(ErrorKind::NotConnected, format!("Timeout triggered before self could connect to all peers: {error}")));
             }

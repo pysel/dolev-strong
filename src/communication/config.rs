@@ -88,7 +88,7 @@ impl Config {
     pub fn get_listen_tcp_stream(&self, peer: &Peer) -> Result<&TcpStream, Error> {
         if let Some(streams) = &self.listen_streams {
             for conn in streams {
-                if conn.peer_addr().expect("Failed to get peer's address") == peer.peer_write_socket.expect("trying to fetch peer's listen connection w/o setting peer's write socket") {
+                if conn.peer_addr().expect("Failed to get peer's address").port() == peer.peer_write_socket.expect("trying to fetch peer's listen connection w/o setting peer's write socket").port() {
                     return Ok(conn)
                 }
             }

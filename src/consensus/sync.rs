@@ -1,10 +1,10 @@
 use std::time::SystemTime;
 
-const PROTOCOL_DELTA: i64 = 2; // the bound on message delays
+const PROTOCOL_DELTA: i64 = 10; // the bound on message delays
 
 // time allocated for communication setup / time before starting the process and starting initial stage
-// it takes 15 seconds because it is containerized
-pub const GENESIS_TIMESTAMP_DELTA: u64 = 10; 
+// it takes 20 seconds because it is containerized
+pub const GENESIS_TIMESTAMP_DELTA: u64 = 100; 
 
 #[derive(Debug)]
 pub struct Synchrony {

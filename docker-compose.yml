@@ -3,7 +3,7 @@ version: "3.8"
 
 services:
   leader: 
-    image: "default_node"
+    image: "ileader"
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,21 +14,55 @@ services:
       CONFIG_INDEX: 0
       CONFIG_PATH: "./config.txt"
       BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+    networks:
+      - default
 
-    volumes:
-      - /Users/ruslanakhtariev/github/dolev-strong:/protocol
-  follower:
-    image: "peer_node"
+  follower1:
+    image: "ifollower1"
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: follower
+    container_name: follower1
     ports: 
       - "8001:8001"
     environment:
       CONFIG_INDEX: 1
       CONFIG_PATH: "./config.txt"
       BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+    networks:
+      - default
 
-    volumes:
-      - /Users/ruslanakhtariev/github/dolev-strong:/protocol
+  follower2:
+    image: "ifollower2"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: follower2
+    ports: 
+      - "8002:8002"
+    environment:
+      CONFIG_INDEX: 2
+      CONFIG_PATH: "./config.txt"
+      BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+    networks:
+      - default
+      
+  # follower3:
+  #   image: "follower3"
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: follower3
+  #   ports: 
+  #     - "8003:8003"
+  #   environment:
+  #     CONFIG_INDEX: 3
+  #     CONFIG_PATH: "./config.txt"
+  #     BOOTSTRAPPING_TIME: ${BOOTSTRAPPING_TIME}
+
+  #   volumes:
+  #     - /Users/ruslanakhtariev/github/dolev-strong:/protocol
+
+networks:
+  default:
+    driver: bridge

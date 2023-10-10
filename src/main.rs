@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, thread::sleep};
 
 use communication::network::docker::wait_until_containers_are_up;
 use consensus::ConsensusNode;
@@ -16,7 +16,8 @@ fn main() {
 
     // Docker hack
     wait_until_containers_are_up();
-
+    // sleep(std::time::Duration::from_secs(9999999));
+    println!("RUNNING NODE NOW");
     run_node(config_index, peers_file, bootstrap_timestamp);
 }
 
