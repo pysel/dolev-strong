@@ -27,11 +27,11 @@ when a node tries to get convinced of some value (that will potentially be outpu
 
 ### Convincing message
 
-A node `i` is considered convinced of value `v` at some stage `R` if it received such a message that:
+A node `i` is considered convinced of value `v` at some stage `S` if it received such a message that:
 
 - it references value `v`
 - it is signed first by a sender
-- it is signed by ``>= R` other distinct nodes, none of which are node `i`
+- it is signed by ``>= S` other distinct nodes, none of which are node `i`
 
 ## Consensus stages
 
