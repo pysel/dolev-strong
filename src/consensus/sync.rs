@@ -30,7 +30,6 @@ impl Synchrony {
     // swait waits until the global beginning of stage s. See SPEC.md for details.
     pub fn swait(&mut self, s: i64) {
         let desired_timestamp = self.get_genesis_stage_ts() + (PROTOCOL_DELTA * s) as u64;
-        println!("current timestamp: {}, desired timestamp: {}", get_current_timestamp(), desired_timestamp);
         if get_current_timestamp() >= desired_timestamp {
             panic!("waiting for stage that already started")
         }

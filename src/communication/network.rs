@@ -1,4 +1,4 @@
-use std::net::{TcpListener, TcpStream};
+use std::net::{TcpListener, TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Write};
 use std::thread::{self, sleep};
 use std::time::{Instant, Duration};
@@ -9,13 +9,10 @@ use crate::communication;
 
 use utils::{new_streams, StreamType, Streams};
 
-use self::docker::DockerSocket;
-
 use super::Communication;
 use super::message::MessageI;
 
 mod utils;
-pub mod docker;
 
 impl communication::Communication {
     // setup establishes connections with other consensus participants and implements PKI
@@ -39,7 +36,7 @@ impl communication::Communication {
         
         let peers: Vec<Peer> = self.config.peers.clone();
         
-        let listen_socket: DockerSocket = self.config.listen_socket();
+        let listen_socket: SocketAddr = self.config.listen_socket();
         let num_peers: usize = self.config.peers.len();
 
         // run thread that waits for connections from other nodes
@@ -95,8 +92,8 @@ impl communication::Communication {
     }
 
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
-    fn bind_and_wait_connection(listen_socket: DockerSocket, num_peers: i32) -> Result<Vec<TcpStream>, Error> {
-        let listener: TcpListener = TcpListener::bind(listen_socket.tuple())
+    fn bind_and_wait_connection(listen_socket: SocketAddr, num_peers: i32) -> Result<Vec<TcpStream>, Error> {
+        let listener: TcpListener = TcpListener::bind(listen_socket)
             .expect("Failed to bind");
 
         let mut peers: Vec<TcpStream> = vec![];
@@ -123,15 +120,14 @@ impl communication::Communication {
     fn connect_to_peers(peers: &Vec<Peer>) -> Result<Vec<TcpStream>, Error> {
         let mut streams: Vec<TcpStream> = Vec::new();
         for peer in peers {
-            println!("Connecting to peer {:?}...", peer.socket.tuple());
-            match TcpStream::connect(peer.socket.tuple()) {
+            match TcpStream::connect(peer.socket.clone()) {
                 Ok(connection) => {
                     connection.set_read_timeout(Some(Duration::new(0, 3000000)))?; // almost third of a second
                     streams.push(connection);
                 }
 
                 Err(e) => {
-                    return Err(Error::new(ErrorKind::NotConnected, format!("Failed to connect to peer {:?} with error: {}", peer.socket.tuple(), e)));
+                    return Err(Error::new(ErrorKind::NotConnected, format!("Failed to connect to peer {} with error {}", peer.socket, e)));
                 }
             }
         }

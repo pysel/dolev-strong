@@ -1,7 +1,0 @@
-/target
-.vscode
-debug.sh
-peer-log.txt
-Dockerfile
-docker-compose.yml
-**.md

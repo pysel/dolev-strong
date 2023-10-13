@@ -19,18 +19,3 @@ test-unit:
 	@clear
 	@cargo test
 
-build:
-	@docker-compose build --quiet
-
-up:
-	@clear
-	@echo
-	@echo Starting up...
-	@echo
-	@BOOTSTRAPPING_TIME=${CURTIME} docker-compose up -d
-	@./scripts/start-services.sh 
-
-ckillall:
-	-@docker kill $(shell docker ps -q)
-
-cbu: ckillall build up

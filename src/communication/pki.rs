@@ -17,8 +17,6 @@ impl Communication {
     }
 
     pub fn receive_pubkeys(&mut self) {
-        sleep(Duration::from_secs(1));
-        
         // println!("Receiving pubkeys...\n");
         if let Err(e) = self.config.receive_pubkeys() {
             panic!("{e}");

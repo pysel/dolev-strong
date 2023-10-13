@@ -2,13 +2,12 @@ use crate::communication::peer::new_peer;
 use crate::utils::fs::{parse_mode, parse_config_lines};
 
 use super::message::serde::deserealize;
-use super::network::docker::DockerSocket;
 use super::peer::Peer;
 use super::Mode;
 use super::message::types::pk_broadcast::{SignedPkBroadcastBzType, PubkeyBroadcastMsgReceived};
 
 use core::panic;
-use std::net::TcpStream;
+use std::net::{TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Read};
 
 #[derive(Debug)]
@@ -17,12 +16,12 @@ pub struct Config {
     mode: Mode, // TODO: consider moving to ConsensusNode
     config_index: i32,
     config_file: String,
-    listen_socket: DockerSocket,
+    listen_socket: SocketAddr,
     listen_streams: Option<Vec<TcpStream>>, // listen_streams is a list of tcp connections from which to expect getting messages from other processes
     write_streams: Option<Vec<TcpStream>> // write_streams is a list of tcp connections to which to send messages to
 }
 
-pub fn new_config(mode: Mode, config_index: i32, config_file: String, peers: Vec<Peer>, listen_socket: DockerSocket, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
+pub fn new_config(mode: Mode, config_index: i32, config_file: String, peers: Vec<Peer>, listen_socket: SocketAddr, listen_streams: Option<Vec<TcpStream>>, write_streams: Option<Vec<TcpStream>>) -> Config {
     Config { mode, config_index, config_file, peers, listen_socket, listen_streams, write_streams }
 }
 
@@ -48,7 +47,7 @@ impl Config {
     //     self.listen_socket = socket_addr;
     // }
 
-    pub fn listen_socket(&self) -> DockerSocket {
+    pub fn listen_socket(&self) -> SocketAddr {
         self.listen_socket.clone()
     }
 
@@ -76,7 +75,7 @@ impl Config {
     pub fn get_write_tcp_stream(&self, peer: &Peer) -> Result<&TcpStream, Error> {
         if let Some(streams) = &self.write_streams {
             for conn in streams {
-                if conn.peer_addr().expect("Failed to get peer's address").port() == peer.socket.port {
+                if conn.peer_addr().expect("Failed to get peer's address") == peer.socket {
                     return Ok(conn)
                 }
             }
@@ -119,7 +118,7 @@ impl Config {
                         let config_lines: Vec<Vec<String>> = parse_config_lines(self.config_file.to_owned());
                         let peer_mode: Mode = parse_mode(config_lines, result.peer_index);
 
-                        self.peers[i] = new_peer(self.peers[i].socket.clone(), Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
+                        self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
 
                         return Ok(())
                     }
