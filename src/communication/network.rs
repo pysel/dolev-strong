@@ -1,6 +1,6 @@
 use std::net::{TcpListener, TcpStream, SocketAddr};
 use std::io::{Error, ErrorKind, Write};
-use std::thread::{self, sleep};
+use std::thread;
 use std::time::{Instant, Duration};
 use std::sync::mpsc;
 
@@ -40,8 +40,7 @@ impl communication::Communication {
         let num_peers: usize = self.config.peers.len();
 
         // run thread that waits for connections from other nodes
-        println!("peers: {:?}", peers);
-        let listening_thread = thread::spawn(move || {
+        thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
@@ -57,7 +56,7 @@ impl communication::Communication {
         });
 
         // run thread that connect to other nodes
-        let writing_thread = thread::spawn(move || {
+        thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(&peers);
             match streams {
                 Ok(streams) => {
@@ -71,24 +70,21 @@ impl communication::Communication {
                 }
             }
         });
-        println!("Connection threads are running!");
+        // println!("Connection threads are running!");
 
         for received in rx {
             if received.s_type == StreamType::LISTEN {
                 let listen_streams = received.streams;
-                println!("Received listen streams: {} || {:?}", listen_streams.len(), listen_streams);
+                // println!("Received listen streams: {} || {:?}", listen_streams.len(), listen_streams);
                 self.config.set_listen_streams(listen_streams)
             } else {
                 let write_streams = received.streams;
-                println!("Received write streams: {} || {:?}", write_streams.len(), write_streams);
+                // println!("Received write streams: {} || {:?}", write_streams.len(), write_streams);
                 self.config.set_write_streams(write_streams)
             }
         }
 
-        writing_thread.join().unwrap();
-        listening_thread.join().unwrap();
-
-        println!("All connections established!")
+        // println!("All connections established!")
     }
 
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port
@@ -100,7 +96,8 @@ impl communication::Communication {
         loop { // wait until all peers are connected
             match listener.accept() {
                 Ok((stream, _)) => {
-                    println!("Accepted connection from port {:?}", stream.peer_addr().unwrap().port());
+                    // println!("Accepted connection from port {:?}", stream.peer_addr().unwrap().port());
+                    stream.set_read_timeout(Some(Duration::new(0, 3000000)))?; // almost third of a second
                     peers.push(stream);
                     if peers.len() == num_peers.try_into().expect("Could not convert num_peers into i32") {
                         break;
@@ -144,7 +141,7 @@ impl communication::Communication {
                 return Ok(streams)
             }
 
-            if start.elapsed() > Duration::from_secs(20) {
+            if start.elapsed() > Duration::from_secs(5) {
                 let error = streams.unwrap_err();
                 break Err(Error::new(ErrorKind::NotConnected, format!("Timeout triggered before self could connect to all peers: {error}")));
             }
@@ -155,7 +152,7 @@ impl communication::Communication {
     pub fn send_message(&self, recepient: &Peer, msg: &dyn MessageI) -> Option<Error> {
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
-                println!("Writing to peer: {:?} || local address: {:?} || index: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index());
+                // println!("Writing to peer: {:?} || local address: {:?} || index: {:?} || msg size: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index(), &msg.serialize(&self.keypair, self.config.config_index()).len());
                 // println!("Message to send: {:?}", &msg.serialize(&self.keypair, self.config.config_index()));
                 // attempt to write a message
                 match write_conn.write(&msg.serialize(&self.keypair, self.config.config_index())) {

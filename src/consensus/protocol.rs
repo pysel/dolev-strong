@@ -1,4 +1,9 @@
+use std::env;
+use std::fs::OpenOptions;
 use std::net::TcpStream;
+use std::process::exit;
+use fs2::FileExt;
+use std::io::Write;
 use std::io::{Read, Error, ErrorKind};
 use crate::communication::message::serde::deserealize;
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
@@ -14,10 +19,11 @@ use super::errors::MessageError;
 
 pub(crate) mod utils;
 pub(crate) mod convincing;
+extern crate fs2;
 
 // F is the upper bound on the number of Byzantine nodes this protocol tolerates. Alias for the number of stages required. See SPEC.md for details
 // TODO: make dynamic
-const F: i64 = 1;
+const F: i64 = 8;
 
 impl ConsensusNode<'_> {
     // enter_stage is used for a node to enter to stage X of consensus
@@ -38,7 +44,6 @@ impl ConsensusNode<'_> {
                 let convincing_message = convincing_message_rcvd.to_consensus_msg();
 
                 // message signing happens during broadcast, no need to explicitly sign here
-                println!("broadcasting message: {:?} on stage {}", convincing_message.clone(), stage);
                 self.communication.broadcast_message(&convincing_message.clone()); // cloning since we want to use the message later 
 
                 self.convincing_messages.push(convincing_message_rcvd);
@@ -54,20 +59,21 @@ impl ConsensusNode<'_> {
             let halting_value = validate_convincing_messages(&self.convincing_messages);
 
             self.halt(halting_value);
-            return
+            return;
         }
 
         self.enter_stage(stage + 1)
     }
 
     // receive_consensus_message receives consensus message from a peer
-    fn receive_consensus_message(&self, peer: &Peer) -> Result<ConsensusMsgReceived, MessageError> {
+    pub fn receive_consensus_message(&self, peer: &Peer) -> Result<ConsensusMsgReceived, MessageError> {
         let mut stream: &TcpStream = self.communication.config.get_listen_tcp_stream(peer)
             .expect(&format!("TcpStream does not exist with Peer {:?}", peer));
+
         let current_stage = self.synchrony.get_current_stage();
         let current_msg_size = current_cons_msg_size(current_stage);
         let mut buf: Vec<u8> = vec![0u8; current_msg_size];
-        println!("Reading {} bytes from {:?}", current_msg_size, peer.socket);
+        // println!("Reading {} bytes from {:?}", current_msg_size, peer.socket);
 
         match stream.read_exact(&mut buf) {
             // if timeout, return Err
@@ -116,8 +122,8 @@ impl ConsensusNode<'_> {
                     result.push(ConsensusMsgReceivedTuple(peer, Some(cmsg)))
                 },
 
-                Err(e) => {
-                    println!("Log: failed to receive stage {} consensus message from peer {:?} with error {}", self.synchrony.get_current_stage(), peer, e);
+                Err(_) => {
+                    // println!("Log: failed to receive stage {} consensus message from peer {:?} with error {}", self.synchrony.get_current_stage(), peer, e);
                     result.push(ConsensusMsgReceivedTuple(peer, None))
                 }
             }
@@ -127,6 +133,17 @@ impl ConsensusNode<'_> {
 
     // halt stops the node and returns a final decision
     fn halt(self, decision: Value) {
-        println!("Halting a node with value: {}", decision);
+        // Open or create the file
+        let mut output_file = OpenOptions::new()
+            .read(true)
+            .append(true)
+            .create(true)
+            .open("output.txt").unwrap();
+
+        // Lock the file
+        output_file.lock_exclusive().unwrap(); // block until this process can lock the file
+        writeln!(output_file, "{} outputted: {}", self, decision).unwrap();
+        output_file.unlock().unwrap();
+        exit(0)
     }
 }

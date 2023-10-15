@@ -1,4 +1,4 @@
-use std::{env, thread::sleep};
+use std::env;
 
 use consensus::ConsensusNode;
 

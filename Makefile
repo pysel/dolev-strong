@@ -1,20 +1,15 @@
 CURTIME := $(shell date +%s) # current system time in UNIX
 
-# runs a default instance of a node. for development purposes.
-run-default:
-	@echo 
-	@echo Launching default node...
-	@echo 
-	@cargo run $(CURDIR)/config.txt 0 ${CURTIME}
+launch:
+	@rm -rf output.txt
+	@./scripts/generate_config.sh ${NODES}
+	./scripts/launch_with_X_nodes.sh ${NODES} ${CURTIME} &
 
-run-nd:
-	@echo
-	@echo Launching peer...
-	@echo
-	@cargo run $(CURDIR)/config.txt 1 ${CURTIME}  > ./peer-log.txt
-
-run-mult: run-default run-nd
-
+launch-10:
+	@rm -rf output.txt
+	@./scripts/generate_config.sh 10
+	./scripts/launch_with_X_nodes.sh 10 ${CURTIME}
+	
 test-unit:
 	@clear
 	@cargo test

@@ -14,6 +14,9 @@ impl Communication {
         if let Some(err) = self.broadcast_message(msg) {
             panic!("{}", format!("failed to establish PKI: error: {}", err)) // panics because PKI assumption is not met
         }
+
+        // sleep to make sure other processes have time to broadcast their pubkeys
+        sleep(Duration::from_secs(1));
     }
 
     pub fn receive_pubkeys(&mut self) {

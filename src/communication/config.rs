@@ -120,7 +120,7 @@ impl Config {
 
                         self.peers[i] = new_peer(self.peers[i].socket, Some(result.pubkey), Some(peer_mode), Some(stream.peer_addr().unwrap()));
 
-                        return Ok(())
+                        continue;
                     }
 
                     panic!("failed to receive pubkeys: deserealized message failed to typecast") // trusted setup assumption not met, hence panic
@@ -131,7 +131,9 @@ impl Config {
                 }
             } 
         }
-        Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
+
+        Ok(())
+        // Err(Error::new(ErrorKind::Interrupted, "Could not receive pubkeys"))
     }
 
     pub fn get_stage_leader(&self) -> Option<Peer> {

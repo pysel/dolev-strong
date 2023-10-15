@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
 use crate::communication::{Communication, self};
@@ -24,6 +26,7 @@ impl<'a> ConsensusNode<'a> {
         let keypair = utils::crypto::gen_keypair();
         let mut communication: Communication = communication::new_node(keypair, config_index, path_to_config_file);
         communication.setup(); // setup communications
+        // println!("Peers: {:?}", communication.config.peers);
 
         let (stage_leader, self_is_leader) = match communication.get_stage_leader() {
             Some(peer) => (Some(peer), false),
@@ -60,9 +63,13 @@ impl<'a> ConsensusNode<'a> {
             panic!("trying to launch a node without specifying it's genesis strategy")
         }
     }
+}
 
-    // current_stage fetches current stage from synchrony
-    pub fn current_stage(&self) -> i64 {
-        self.synchrony.get_current_stage()
+impl Display for ConsensusNode<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mode = if self.self_is_leader { "leader" } else { "follower" };
+        let suffix = if self.self_is_leader { String::new() } else { format!("{}", self.communication.config.config_index()) };
+        let display = format!("{}{}", mode, suffix);
+        write!(f, "{}", display)
     }
 }

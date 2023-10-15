@@ -9,16 +9,19 @@ impl GenesisStrategy for FollowerStrategy {
 
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
-        let received_messages: Vec<ConsensusMsgReceivedTuple<'_>> = self_node.receive_all_consensus_messages();
-        println!("Received messages during genesis: {:?}", received_messages);
+        let stage_leader = self_node.stage_leader.unwrap();
+        let proposal = self_node.receive_consensus_message(&stage_leader).expect("No messages received in first stage");
+        // println!("Received messages during genesis: {:?}", proposal.clone());
+
+        let tuple_proposal = vec![ConsensusMsgReceivedTuple(&stage_leader, Some(proposal))];
 
         // since the message is convincing, we can directly unwrap the received message
-        let consensus_msg: ConsensusMsg = validate_messages_received_on_proposal(&received_messages, &self_node);
+        let consensus_msg: ConsensusMsg = validate_messages_received_on_proposal(&tuple_proposal, &self_node);
 
         // convincing proposal is added to the list of convincing messages
-        self_node.convincing_messages.push(received_messages[0].clone().1.unwrap());
+        self_node.convincing_messages.push(tuple_proposal[0].clone().1.unwrap());
 
-        println!("Received convincing proposal, broadcasting: {:?}", consensus_msg);
+        // println!("Received convincing proposal, broadcasting: {:?}", consensus_msg);
         self_node.communication.broadcast_message(&consensus_msg);
 
         self_node.enter_stage(1);
