@@ -15,6 +15,7 @@ mod errors;
 pub struct ConsensusNode<'a> {
     pub communication: Communication,
     pub genesis_strategy: Option<&'a dyn GenesisStrategy>,
+    F: i64, // F is the upper bound on the number of Byzantine nodes this protocol tolerates. Alias for the number of stages required. See SPEC.md for details
     self_is_leader: bool,
     stage_leader: Option<Peer>,
     synchrony: Synchrony, // will be used for synchrony
@@ -22,7 +23,7 @@ pub struct ConsensusNode<'a> {
 }
 
 impl<'a> ConsensusNode<'a> {
-    pub fn new_consensus_node(config_index: i32, path_to_config_file: String, bootstrap_timestamp: u64) -> ConsensusNode<'a> {
+    pub fn new_consensus_node(config_index: i32, path_to_config_file: String, bootstrap_timestamp: u64, F: i64) -> ConsensusNode<'a> {
         let keypair = utils::crypto::gen_keypair();
         let mut communication: Communication = communication::new_node(keypair, config_index, path_to_config_file);
         communication.setup(); // setup communications
@@ -37,6 +38,7 @@ impl<'a> ConsensusNode<'a> {
 
         let mut consensus_node: ConsensusNode<'a> = ConsensusNode{
             communication, 
+            F,
             genesis_strategy: None, 
             self_is_leader, 
             stage_leader, 

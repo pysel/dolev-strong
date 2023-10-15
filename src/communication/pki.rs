@@ -16,7 +16,7 @@ impl Communication {
         }
 
         // sleep to make sure other processes have time to broadcast their pubkeys
-        sleep(Duration::from_secs(1));
+        sleep(Duration::from_secs(3));
     }
 
     pub fn receive_pubkeys(&mut self) {

@@ -1,4 +1,3 @@
-use std::env;
 use std::fs::OpenOptions;
 use std::net::TcpStream;
 use std::process::exit;
@@ -21,16 +20,12 @@ pub(crate) mod utils;
 pub(crate) mod convincing;
 extern crate fs2;
 
-// F is the upper bound on the number of Byzantine nodes this protocol tolerates. Alias for the number of stages required. See SPEC.md for details
-// TODO: make dynamic
-const F: i64 = 8;
-
 impl ConsensusNode<'_> {
     // enter_stage is used for a node to enter to stage X of consensus
     pub fn enter_stage(mut self, stage: i64) {
         println!("Entering stage {}", stage);
-        if stage > F {
-            panic!("maximum number of stages is {}, trying to enter bigger stage {}", F, stage)
+        if stage > self.F {
+            panic!("maximum number of stages is {}, trying to enter bigger stage {}", self.F, stage)
         }
 
         // wait until the beginning of a stage
@@ -55,7 +50,7 @@ impl ConsensusNode<'_> {
         }
         
         // check if it is time to halt
-        if stage == F {
+        if stage == self.F {
             let halting_value = validate_convincing_messages(&self.convincing_messages);
 
             self.halt(halting_value);
