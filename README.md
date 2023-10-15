@@ -19,7 +19,30 @@ Under said assumptions, `f` can be arbitrarily large. Even if 2 nodes run the pr
 
 ## Running a Protocol
 
-TODO: add instructions on how to run the protocol.
+There are two ways to execute a protocol: by setting arbitrary values for amount of nodes in the system, and F (configurable)
+and by running a default configuration (10 nodes total, tolerating 8 Byzantine nodes).
 
-Currently, the protocol is still under development, so it is not possible to run it yet.
-Once I finish implementing it, I will add instructions on how to run it.
+In either way, each node will write it's output into a file `output.txt` in the root of the project.
+It will be recreated for every launch of the protocol.
+
+### Configurable way
+
+To run a protocol, execute:
+
+```bash
+make NODES=X F=Y launch
+```
+
+where `X` is a number of nodes and `Y` is a number of Byzantine nodes a protocol will be able to tolerate
+(in other words, a number of stages a protocol will execute).
+
+Note: available values for `Y`: [0; X-2].
+Reason: there should be at least 2 honest nodes in the system.
+
+### Default way
+
+To run a protocol in default mode, execute:
+
+```bash
+    make launch-default
+```
