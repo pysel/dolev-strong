@@ -6,7 +6,7 @@ CURTIME := $(shell date +%s) # current system time in UNIX
 launch:
 	@rm -rf output.txt
 	@./scripts/generate_config.sh ${NODES}
-	./scripts/launch_with_X_nodes.sh ${NODES} ${F} ${CURTIME} &
+	./scripts/launch_with_X_nodes.sh ${NODES} ${F} ${CURTIME} 
 
 # launch-default launches a protocol with 1 leader and 9 followers
 # sets F to 8 (hence, 8 Byzantine nodes can be tolerated)

@@ -37,7 +37,12 @@ where `X` is a number of nodes and `Y` is a number of Byzantine nodes a protocol
 (in other words, a number of stages a protocol will execute).
 
 Note: available values for `Y`: [0; X-2].
+
 Reason: there should be at least 2 honest nodes in the system.
+
+Note#2: available values for `X`: 3+.
+
+Reason: there should be at least 3 nodes in the consensus instance (otherwise, it's trivial).
 
 ### Default way
 
