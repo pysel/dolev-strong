@@ -13,6 +13,12 @@ pub mod exported;
 pub enum Mode {
     LEADER,
     FOLLOWER,
+    ByzantineLeader(LeaderByzantine),
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum LeaderByzantine {
+    NULLPROPOSAL,
 }
 
 // Communication contains keypair used when signing messages and a configuration struct

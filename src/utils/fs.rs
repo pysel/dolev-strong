@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 use std::net::SocketAddr;
 
-use crate::communication::{peer, Mode};
+use crate::communication::{peer, Mode, LeaderByzantine};
 
 fn parse_peers(config_lines: &mut Vec<Vec<String>>, config_index: i32) -> Vec<peer::Peer> {
     let mut result: Vec<peer::Peer> = Vec::new();
@@ -35,6 +35,7 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
     match mode {
         "leader" => Mode::LEADER,
         "follower" => Mode::FOLLOWER,
+        "leader_null_proposal" => Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL),
         _ => panic!("Invalid mode {mode}, should be either `follower` or `leader`")
     }
 }

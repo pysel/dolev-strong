@@ -27,7 +27,7 @@ impl Display for Value {
         match self {
             Value::Zero => write!(f, "0"),
             Value::One => write!(f, "1"),
-            Value::DEFAULT => write!(f, "default"),
+            Value::DEFAULT => write!(f, "NULL"),
         }
     }
 }

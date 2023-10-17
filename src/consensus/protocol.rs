@@ -3,7 +3,7 @@ use std::net::TcpStream;
 use std::process::exit;
 use fs2::FileExt;
 use std::io::Write;
-use std::io::{Read, Error, ErrorKind};
+use std::io::{Read, Error};
 use crate::communication::message::serde::deserealize;
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
@@ -71,11 +71,6 @@ impl ConsensusNode<'_> {
         // println!("Reading {} bytes from {:?}", current_msg_size, peer.socket);
 
         match stream.read_exact(&mut buf) {
-            // if timeout, return Err
-            Err(e) if e.kind() == ErrorKind::TimedOut => {
-                return Err(MessageError::ErrReadExact{ e })
-            },
-
             Err(e) => {
                 let e =  Error::new(
                     std::io::ErrorKind::Other, 
@@ -127,7 +122,7 @@ impl ConsensusNode<'_> {
     }
 
     // halt stops the node and returns a final decision
-    fn halt(self, decision: Value) {
+    pub fn halt(&self, decision: Value) {
         // Open or create the file
         let mut output_file = OpenOptions::new()
             .read(true)

@@ -1,5 +1,7 @@
+use std::process::exit;
+
 use super::GenesisStrategy;
-use crate::{consensus::{ConsensusNode, protocol::convincing::ConsensusMsgReceivedTuple}, communication::message::ConsensusMsg};
+use crate::{consensus::{ConsensusNode, protocol::convincing::ConsensusMsgReceivedTuple}, communication::message::{ConsensusMsg, Value, types::consensus::ConsensusMsgReceived}};
 
 pub struct FollowerStrategy;
 
@@ -10,7 +12,13 @@ impl GenesisStrategy for FollowerStrategy {
         if self_node.self_is_leader { panic!("leader node has follower's strategy") } // sanity check
         
         let stage_leader = self_node.stage_leader.unwrap();
-        let proposal = self_node.receive_consensus_message(&stage_leader).expect("No messages received in first stage");
+        let proposal: ConsensusMsgReceived = self_node.receive_consensus_message(&stage_leader).unwrap_or_else(
+            |_| {
+                self_node.halt(Value::DEFAULT);
+                exit(0)
+            }
+        );
+
         // println!("Received messages during genesis: {:?}", proposal.clone());
 
         let tuple_proposal = vec![ConsensusMsgReceivedTuple(&stage_leader, Some(proposal))];

@@ -40,7 +40,7 @@ impl communication::Communication {
         let num_peers: usize = self.config.peers.len();
 
         // run thread that waits for connections from other nodes
-        thread::spawn(move || {
+        let listening_handle = thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::bind_and_wait_connection(listen_socket, num_peers.try_into().unwrap());
             match streams {
                 Ok(streams) => {
@@ -56,7 +56,7 @@ impl communication::Communication {
         });
 
         // run thread that connect to other nodes
-        thread::spawn(move || {
+        let writing_handle = thread::spawn(move || {
             let streams: Result<Vec<TcpStream>, Error> = Communication::connect_until_success(&peers);
             match streams {
                 Ok(streams) => {
@@ -70,7 +70,6 @@ impl communication::Communication {
                 }
             }
         });
-        // println!("Connection threads are running!");
 
         for received in rx {
             if received.s_type == StreamType::LISTEN {
@@ -84,7 +83,8 @@ impl communication::Communication {
             }
         }
 
-        // println!("All connections established!")
+        listening_handle.join().unwrap();
+        writing_handle.join().unwrap();
     }
 
     // bind_and_wait_Config binds a listening port of this node and waits for other peers to connect to this port

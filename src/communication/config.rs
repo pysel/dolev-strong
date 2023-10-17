@@ -1,3 +1,4 @@
+use crate::communication::LeaderByzantine;
 use crate::communication::peer::new_peer;
 use crate::utils::fs::{parse_mode, parse_config_lines};
 
@@ -137,12 +138,12 @@ impl Config {
     }
 
     pub fn get_stage_leader(&self) -> Option<Peer> {
-        if self.mode() == Mode::LEADER {
+        if self.mode() != Mode::FOLLOWER {
             return None
         }
         
         for peer in &self.peers {
-            if peer.mode.unwrap() == Mode::LEADER {
+            if peer.mode.unwrap() == Mode::LEADER || peer.mode.unwrap() == Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL) {
                 return Some(peer.clone())
             }
         }  
