@@ -51,3 +51,21 @@ To run a protocol in default mode, execute:
 ```bash
     make launch-default
 ```
+
+## Running a protocol with Byzantine nodes
+
+### Byzantine Leader
+
+Currently, available Byzantine modes for a leader are:
+
+* Null Proposal - a leader does not broadcast a proposal
+
+#### Null Proposal
+
+To run a default instance of a protocol in null proposal mode, execute:
+
+```bash
+    make launch-null-proposal-default
+```
+
+To run a custom instance of a protocol in null proposal mode, refer to Makefile's target `launch-null-proposal`.
