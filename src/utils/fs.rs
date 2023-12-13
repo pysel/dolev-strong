@@ -36,6 +36,7 @@ pub fn parse_mode(config_lines: Vec<Vec<String>>, config_index: i32) -> Mode {
         "leader" => Mode::LEADER,
         "follower" => Mode::FOLLOWER,
         "leader_null_proposal" => Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL),
+        "leader_conflicting_proposal" => Mode::ByzantineLeader(LeaderByzantine::CONFLICTINGPROPOSAL),
         _ => panic!("Invalid mode {mode}, should be either `follower` or `leader`")
     }
 }

@@ -143,7 +143,9 @@ impl Config {
         }
         
         for peer in &self.peers {
-            if peer.mode.unwrap() == Mode::LEADER || peer.mode.unwrap() == Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL) {
+            if peer.mode.unwrap() == Mode::LEADER || 
+                peer.mode.unwrap() == Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL) || 
+                peer.mode.unwrap() == Mode::ByzantineLeader(LeaderByzantine::CONFLICTINGPROPOSAL) {
                 return Some(peer.clone())
             }
         }  

@@ -30,8 +30,8 @@ impl ConsensusNode<'_> {
 
         // wait until the beginning of a stage
         self.swait(stage);
-        let pending_messages = &self.receive_all_consensus_messages();
-    
+        let pending_messages = self.receive_all_consensus_messages().clone();
+        let mut convincing_messages: Vec<ConsensusMsgReceived> = Vec::new();
         for pending_message in pending_messages {
             // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
             if pending_message.convincing(&self) {
@@ -40,13 +40,15 @@ impl ConsensusNode<'_> {
 
                 // message signing happens during broadcast, no need to explicitly sign here
                 self.communication.broadcast_message(&convincing_message.clone()); // cloning since we want to use the message later 
-
-                self.convincing_messages.push(convincing_message_rcvd);
-
+                convincing_messages.push(convincing_message_rcvd);
                 // it is possible that a node receives multiple convincing messages, but we only need one 
                 // to broadcast to peers, so we break here
-                break;
+                // break;
             }
+        }
+
+        if convincing_messages.len() > 0 {
+            self.add_convincing_messages(&mut convincing_messages);
         }
         
         // check if it is time to halt
@@ -119,6 +121,10 @@ impl ConsensusNode<'_> {
             }
         }
         result
+    }
+
+    fn add_convincing_messages(&mut self, msgs: &mut Vec<ConsensusMsgReceived>) {
+        self.convincing_messages.append(msgs)
     }
 
     // halt stops the node and returns a final decision

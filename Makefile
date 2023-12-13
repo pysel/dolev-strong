@@ -31,6 +31,12 @@ launch-null-proposal-default:
 	@./scripts/set_leader_strategy.sh leader_null_proposal
 	./scripts/launch_with_X_nodes.sh 10 8 ${CURTIME}
 
+launch-conflicting-proposal-default:
+	@rm -rf output.txt
+	@./scripts/generate_config.sh 10
+	@./scripts/set_leader_strategy.sh leader_conflicting_proposal
+	./scripts/launch_with_X_nodes.sh 10 8 ${CURTIME}
+
 # generate-config generates a config file with NODES amount of nodes
 # example: make NODES=10 generate-config
 generate-config:

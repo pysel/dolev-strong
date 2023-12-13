@@ -6,7 +6,7 @@
 # 2. "leader_null_proposal" (corresponds to malicious behavior: no proposal send out during genesis stage)
 
 strategy=$1
-valid_strategies=("leader" "leader_null_proposal")
+valid_strategies=("leader" "leader_null_proposal" "leader_conflicting_proposal")
 
 if [[ ! " ${valid_strategies[@]} " =~ " ${strategy} " ]]; then
     echo -e "\033[31mERROR:\033[0m Invalid strategy: got $strategy, expected one of [${valid_strategies[@]}]" >&2

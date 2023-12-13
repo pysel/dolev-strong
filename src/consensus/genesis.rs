@@ -2,7 +2,7 @@ use crate::communication::{LeaderByzantine, self};
 use crate::communication::Mode::{LEADER, FOLLOWER};
 use crate::consensus::genesis::strategy::{follower::FollowerStrategy, leader::LeaderStrategy};
 
-use self::strategy::byzantine_leader::NullProposalStrategy;
+use self::strategy::byzantine_leader::{NullProposalStrategy, ConflictingProposalStrategy};
 
 use super::ConsensusNode;
 
@@ -21,6 +21,10 @@ impl ConsensusNode<'_> {
 
             communication::Mode::ByzantineLeader(LeaderByzantine::NULLPROPOSAL) => {
                 self.set_genesis_strategy(&NullProposalStrategy)
+            }
+
+            communication::Mode::ByzantineLeader(LeaderByzantine::CONFLICTINGPROPOSAL) => {
+                self.set_genesis_strategy(&ConflictingProposalStrategy)
             }
         }
     }

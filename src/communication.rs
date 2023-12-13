@@ -19,6 +19,7 @@ pub enum Mode {
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum LeaderByzantine {
     NULLPROPOSAL,
+    CONFLICTINGPROPOSAL,
 }
 
 // Communication contains keypair used when signing messages and a configuration struct
