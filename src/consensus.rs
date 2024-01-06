@@ -45,6 +45,7 @@ impl<'a> ConsensusNode<'a> {
             synchrony, 
             convincing_messages: vec![], // empty in the beginning 
         };
+
         consensus_node.setup_genesis_strategy(); // set genesis strategy for this node
 
         consensus_node

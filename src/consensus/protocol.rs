@@ -1,6 +1,7 @@
 use std::fs::OpenOptions;
 use std::net::TcpStream;
 use std::process::exit;
+use std::thread::sleep;
 use fs2::FileExt;
 use std::io::Write;
 use std::io::{Read, Error};
@@ -8,6 +9,7 @@ use crate::communication::message::serde::deserealize;
 use crate::communication::message::types::consensus::ConsensusMsgReceived;
 use crate::communication::peer::Peer;
 use crate::consensus::protocol::convincing::validate_convincing_messages;
+use crate::communication::message::ConsensusMsg;
 
 use self::convincing::ConsensusMsgReceivedTuple;
 use self::utils::current_cons_msg_size;
@@ -30,23 +32,38 @@ impl ConsensusNode<'_> {
 
         // wait until the beginning of a stage
         self.swait(stage);
+
         let pending_messages = &self.receive_all_consensus_messages();
-    
-        for pending_message in pending_messages {
-            // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
-            if pending_message.convincing(&self) {
-                let convincing_message_rcvd: ConsensusMsgReceived = pending_message.1.clone().unwrap();
-                let convincing_message = convincing_message_rcvd.to_consensus_msg();
+        let mut convincing_this_stage: Vec<ConsensusMsgReceived> = vec![];
 
-                // message signing happens during broadcast, no need to explicitly sign here
-                self.communication.broadcast_message(&convincing_message.clone()); // cloning since we want to use the message later 
+        for peer_result in pending_messages {
+            for pending_message in peer_result {
 
-                self.convincing_messages.push(convincing_message_rcvd);
+                if pending_message.1.is_none() {
+                    continue
+                }
 
-                // it is possible that a node receives multiple convincing messages, but we only need one 
-                // to broadcast to peers, so we break here
-                break;
+                // protocol requirement: if a node finds a convincing message, it needs to notify it's peers
+                if pending_message.convincing(&self) {
+                    let convincing_message_rcvd: ConsensusMsgReceived = pending_message.1.clone().unwrap();
+                    let convincing_message: ConsensusMsg = convincing_message_rcvd.to_consensus_msg();
+
+                    // message signing happens during broadcast, no need to explicitly sign here
+                    self.communication.broadcast_message(&convincing_message.clone()); // cloning since we want to use the message later 
+                    convincing_this_stage.push(convincing_message_rcvd);
+
+                    // it is possible that a node receives multiple convincing messages, but we only need one 
+                    // to broadcast to peers, so we break here
+                    // break;
+                }
+                // println!("Received message from peer {:?}: {:?}", pending_message.0, pending_message.1);
             }
+        }
+
+        // add convincing messages to the list of all convincing messages
+        if convincing_this_stage.len() > 0 {
+            println!("Found {} convincing messages", convincing_this_stage.len());
+            self.convincing_messages.extend(convincing_this_stage);
         }
         
         // check if it is time to halt
@@ -67,10 +84,11 @@ impl ConsensusNode<'_> {
 
         let current_stage = self.synchrony.get_current_stage();
         let current_msg_size = current_cons_msg_size(current_stage);
-        let mut buf: Vec<u8> = vec![0u8; current_msg_size];
-        // println!("Reading {} bytes from {:?}", current_msg_size, peer.socket);
+        
+        let mut buf: Vec<u8> = vec![];
+        println!("Reading {} bytes from {:?}", current_msg_size, peer.socket);
 
-        match stream.read_exact(&mut buf) {
+        match stream.read_to_end(&mut buf) {
             Err(e) => {
                 let e =  Error::new(
                     std::io::ErrorKind::Other, 
@@ -82,8 +100,9 @@ impl ConsensusNode<'_> {
 
             _ => {} // ignore ok
         }
-
-        if buf.len() != current_msg_size {
+        println!("Received {} bytes from {:?}", buf.len(), peer.socket);
+        
+        if buf.len() % current_msg_size != 0 {
             return Err(MessageError::ErrInvalidMsgSize { size: buf.len() });
         }
 
@@ -104,19 +123,25 @@ impl ConsensusNode<'_> {
     }
 
     // receive_all_consensus_messages tries to receive all consensus messages from all nodes
-    pub fn receive_all_consensus_messages(&self) -> Vec<ConsensusMsgReceivedTuple> {
-        let mut result: Vec<ConsensusMsgReceivedTuple> = vec![];
+    pub fn receive_all_consensus_messages(&self) -> Vec<Vec<ConsensusMsgReceivedTuple>> {
+        let mut result: Vec<Vec<ConsensusMsgReceivedTuple>> = vec![];
         for peer in &self.communication.config.peers {
-            match self.receive_consensus_message(&peer) {
-                Ok(cmsg) => {
-                    result.push(ConsensusMsgReceivedTuple(peer, Some(cmsg)))
-                },
+            let mut peer_result: Vec<ConsensusMsgReceivedTuple<'_>> = vec![];
 
-                Err(_) => {
-                    // println!("Log: failed to receive stage {} consensus message from peer {:?} with error {}", self.synchrony.get_current_stage(), peer, e);
-                    result.push(ConsensusMsgReceivedTuple(peer, None))
+            loop {
+                match self.receive_consensus_message(&peer) {
+                    Ok(cmsg) => {
+                        peer_result.push(ConsensusMsgReceivedTuple(peer, Some(cmsg)))
+                    },
+    
+                    Err(_) => {
+                        // println!("Log: failed to receive stage {} consensus message from peer {:?} with error {}", self.synchrony.get_current_stage(), peer, e);
+                        // peer_result.push(ConsensusMsgReceivedTuple(peer, None))
+                        break
+                    }
                 }
             }
+            result.push(peer_result);
         }
         result
     }
@@ -134,6 +159,8 @@ impl ConsensusNode<'_> {
         output_file.lock_exclusive().unwrap(); // block until this process can lock the file
         writeln!(output_file, "{} outputted: {}", self, decision).unwrap();
         output_file.unlock().unwrap();
+
+        sleep(std::time::Duration::from_secs(1));
         exit(0)
     }
 }

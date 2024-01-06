@@ -150,11 +150,15 @@ impl communication::Communication {
 
     // send_message sends message to a peer
     pub fn send_message(&self, recepient: &Peer, msg: &dyn MessageI) -> Option<Error> {
+        // println!("Sending message to peer: msg: {:?} ", msg.serialize(&self.keypair, self.config.config_index()));
+
         match self.config.get_write_tcp_stream(recepient) {
             Ok(mut write_conn) => {
                 // println!("Writing to peer: {:?} || local address: {:?} || index: {:?} || msg size: {:?}", recepient.socket, write_conn.local_addr(), self.config.config_index(), &msg.serialize(&self.keypair, self.config.config_index()).len());
                 // println!("Message to send: {:?}", &msg.serialize(&self.keypair, self.config.config_index()));
                 // attempt to write a message
+                println!("Sending message: {:?}", &msg.serialize(&self.keypair, self.config.config_index()));
+
                 match write_conn.write(&msg.serialize(&self.keypair, self.config.config_index())) {
                     Err(e) => {
                         Some(Error::new(ErrorKind::Other, format!("Failed to send message with error {e}")))
@@ -172,6 +176,16 @@ impl communication::Communication {
                             }
                         }
 
+                    }
+                };
+
+                match write_conn.flush() {
+                    Err(e) => {
+                        return Some(Error::new(ErrorKind::Other, format!("Failed to flush connection {e}")))
+                    }
+
+                    Ok(_) => {
+                        return None
                     }
                 }
             }

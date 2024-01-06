@@ -24,6 +24,8 @@ pub mod pk_broadcast;
 pub mod consensus;
 
 pub fn deserealize(bz: Vec<u8>) -> Result<Box<dyn ReceivedMessageI>, Error> { // TODO: use factory here, very bad design atm, DRY also 
+    println!("First 10 bytes: {:?}", &bz);
+
     let message_type: &str = str::from_utf8(&bz[..2]).expect("Provided bytes have invalid message type");
     let result: Result<Box<dyn ReceivedMessageI>, Error> = match message_type {
         // Tries to deserealize as pubkey broadcast message

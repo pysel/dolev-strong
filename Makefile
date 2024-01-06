@@ -56,3 +56,6 @@ test-unit:
 	@clear
 	@cargo test
 
+build:
+	@clear
+	@cargo build
