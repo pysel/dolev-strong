@@ -22,7 +22,7 @@ impl MessageI for ConsensusMsg {
         let mut signed_bz: Vec<u8> = vec![];
         signed_bz.append(&mut bz);
         signed_bz.append(&mut signature.to_bytes().to_vec());
-
+        // println!("Serialized consensus message: {:?}", signed_bz);
         signed_bz
     }
 }

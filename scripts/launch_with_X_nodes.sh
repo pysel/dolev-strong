@@ -16,11 +16,15 @@ if [ $F -gt $upperbound_F ]; then
     exit 1
 fi
 
-cargo run $(pwd)/config.txt 0 $F $curtime & # launch leader
+mkdir $(pwd)/log
+touch $(pwd)/log/node0.log
+
+cargo run $(pwd)/config.txt 0 $F $curtime > $(pwd)/log/node0.log & # launch leader
 
 for ((i=1; i<$num_of_nodes; i++))
 do
-    cargo run $(pwd)/config.txt $i $F $curtime &
+    touch $(pwd)/log/node$i.log
+    cargo run $(pwd)/config.txt $i $F $curtime > $(pwd)/log/node$i.log &
 done
 
 wait
