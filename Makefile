@@ -47,7 +47,7 @@ set-leader-strategy:
 # Prior to running this target:
 #   * Generate a custom config with `make generate-config` 
 #   * Set a desired leader strategy with `make set-leader-strategy`
-# NOTE: not workind yet
+# NOTE: not working yet
 launch-custom-config:
 	@rm -rf output.txt
 	./scripts/launch_with_X_nodes.sh ${NODES} ${F} ${CURTIME}
