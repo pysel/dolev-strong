@@ -59,3 +59,7 @@ test-unit:
 build:
 	@clear
 	@cargo build
+
+protogen:
+	@clear
+	@cd proto; cargo run
