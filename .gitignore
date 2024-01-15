@@ -2,4 +2,5 @@
 .vscode
 config.txt
 output.txt
-log
+/log
+/proto/target
