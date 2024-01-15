@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dolevstrong.basic;
+
+enum Value {
+    ZERO = 0;
+    ONE = 1;
+    DEFAULT = 2;
+}
+
+message Signature {
+    bytes signature = 1;
+}
