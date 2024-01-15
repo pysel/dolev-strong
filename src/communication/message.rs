@@ -35,6 +35,7 @@ pub struct ConsensusMsg {
     pub value: Value,
     signatures: Vec<Signature>, // those signatures, which node already knows (not-included node's yet)
 }
+
 pub fn new_consensus_msg(value: Value, signatures: Vec<Signature>) -> ConsensusMsg {
     ConsensusMsg { value, signatures }
 }
@@ -43,5 +44,3 @@ pub struct PubkeyBroadcastMsg(PublicKey);
 pub fn new_pk_broadcast_msg(pk: PublicKey) -> PubkeyBroadcastMsg {
     PubkeyBroadcastMsg(pk)
 }
-
-pub struct EncodedMsg([u8]);
