@@ -13,8 +13,7 @@ use crate::communication::message::ConsensusMsg;
 
 use self::convincing::ConsensusMsgReceivedTuple;
 use self::utils::current_cons_msg_size;
-use crate::communication::message::Value;
-
+use crate::prototypes::dolevstrong::Value;
 use super::ConsensusNode;
 use super::errors::MessageError;
 

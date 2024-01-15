@@ -1,7 +1,8 @@
 
 use rand::Rng;
 
-use crate::{consensus::ConsensusNode, communication::message::{Value, new_consensus_msg}};
+use crate::{consensus::ConsensusNode, communication::message::new_consensus_msg};
+use crate::prototypes::dolevstrong::Value;
 use super::GenesisStrategy;
 
 pub struct LeaderStrategy;

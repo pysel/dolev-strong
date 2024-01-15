@@ -1,5 +1,5 @@
-use crate::{communication::{peer::Peer, message::{types::consensus::ConsensusMsgReceived, Value}, pki::is_valid_signature}, consensus::ConsensusNode};
-
+use crate::{communication::{peer::Peer, message::types::consensus::ConsensusMsgReceived, pki::is_valid_signature}, consensus::ConsensusNode};
+use crate::prototypes::dolevstrong::Value;
 #[derive(Debug, Clone)]
 pub struct ConsensusMsgReceivedTuple<'a>(pub &'a Peer, pub Option<ConsensusMsgReceived>);
 
@@ -54,7 +54,7 @@ pub(crate) fn validate_convincing_messages(msgs: &Vec<ConsensusMsgReceived>) -> 
     // if no convincing messages received, return default value
     // signifies that a leader is Byzantine
     if msgs.len() == 0 {
-        return Value::DEFAULT
+        return Value::Default
     }
 
     // if there is at least one convincing message, check that all messages have the same proposed value
@@ -62,7 +62,7 @@ pub(crate) fn validate_convincing_messages(msgs: &Vec<ConsensusMsgReceived>) -> 
     for i in 0..msgs.len() {
         let msg: &ConsensusMsgReceived = &msgs[i];
         if msg.proposed_value != *base_value {
-            return Value::DEFAULT
+            return Value::Default
         }
     }
     

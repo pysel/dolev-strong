@@ -6,6 +6,7 @@ use consensus::ConsensusNode;
 mod communication;
 mod utils;
 mod consensus;
+mod prototypes;
 
 fn main() {
     println!("Starting consensus node");

@@ -63,4 +63,4 @@ build:
 # Generates the types
 protogen:
 	@clear
-	@cd proto; cargo run
+	@cd proto; buf generate

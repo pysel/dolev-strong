@@ -1,6 +1,7 @@
 use ed25519_dalek::Signature;
 
-use crate::communication::message::{types::consensus::MSG_TYPE_CON, Value};
+use crate::communication::message::types::consensus::MSG_TYPE_CON;
+use crate::prototypes::dolevstrong::Value;
 
 // current_cons_msg_size returns the number of bytes of an expected consensus message at current stage
 pub(crate) fn current_cons_msg_size(s: i64) -> usize {

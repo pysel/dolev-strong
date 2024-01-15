@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package dolevstrong.basic;
+package dolevstrong;
 
 enum Value {
     ZERO = 0;
     ONE = 1;
-    DEFAULT = 2;
+    Default = 2;
 }
 
 message Signature {

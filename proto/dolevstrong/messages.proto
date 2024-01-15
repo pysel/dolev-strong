@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package dolevstrong.messages;
+package dolevstrong;
 
-import "basic.proto";
+import "dolevstrong/basic.proto";
 
 message ConsensusMsg {
-    basic.Value value = 1;
-    basic.Signature signature = 2;
+    Value value = 1;
+    Signature signature = 2;
 }
 
 message PubkeyBroadcastMsg {

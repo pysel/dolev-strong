@@ -1,7 +1,8 @@
 use std::process::exit;
 
 use super::GenesisStrategy;
-use crate::{consensus::{ConsensusNode, protocol::convincing::ConsensusMsgReceivedTuple}, communication::message::{ConsensusMsg, Value, types::consensus::ConsensusMsgReceived}};
+use crate::{consensus::{ConsensusNode, protocol::convincing::ConsensusMsgReceivedTuple}, communication::message::{ConsensusMsg, types::consensus::ConsensusMsgReceived}};
+use crate::prototypes::dolevstrong::Value;
 
 pub struct FollowerStrategy;
 
@@ -14,7 +15,7 @@ impl GenesisStrategy for FollowerStrategy {
         let stage_leader = self_node.stage_leader.unwrap();
         let proposal: ConsensusMsgReceived = self_node.receive_consensus_message(&stage_leader).unwrap_or_else(
             |_| {
-                self_node.halt(Value::DEFAULT);
+                self_node.halt(Value::Default);
                 exit(0)
             }
         );

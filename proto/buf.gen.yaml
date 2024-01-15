@@ -1,0 +1,18 @@
+version: v1
+plugins:
+  - plugin: buf.build/community/neoeinstein-prost:v0.2.3
+    out: ../src/prototypes
+    opt:
+      - compile_well_known_types
+      - extern_path=.google.protobuf=::pbjson_types
+  - plugin: buf.build/community/neoeinstein-prost-serde:v0.2.3
+    out: ../src/prototypes
+  - plugin: buf.build/community/neoeinstein-tonic:v0.3.0
+    out: ../src/prototypes
+    opt:
+      - compile_well_known_types
+      - extern_path=.google.protobuf=::pbjson_types
+  # - plugin: buf.build/community/neoeinstein-prost:v0.2.3
+  #   out: ../src/prototypes
+  #   opt:
+  #     - gen_crate=Cargo.toml.tpl

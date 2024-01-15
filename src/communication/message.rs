@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use std::{any::Any, fmt::{Display, self}};
-
+use crate::prototypes::dolevstrong::Value;
 use ed25519_dalek::{PublicKey, Signature, Keypair};
 
 pub mod serde;
@@ -14,20 +14,12 @@ pub trait ReceivedMessageI {
     fn as_any(&self) -> &dyn Any; // required for downcasting
 }
 
-// A binary value all honest nodes must agree on
-#[derive(Clone, Debug, PartialEq)]
-pub enum Value {
-    Zero,
-    One,
-    DEFAULT,
-}
-
 impl Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Value::Zero => write!(f, "0"),
             Value::One => write!(f, "1"),
-            Value::DEFAULT => write!(f, "NULL"),
+            Value::Default => write!(f, "NULL"),
         }
     }
 }

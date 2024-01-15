@@ -12,3 +12,7 @@ tokio = { version = "1", features = ["full"] }
 thiserror = { version = "1.0.31" }
 flock = "0.2"
 fs2 = "0.4"
+protobuf = "3.3.0"
+serde = "1.0.195"
+prost = "0.12.3"
+pbjson = "0.6.0"
