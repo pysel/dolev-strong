@@ -60,6 +60,7 @@ build:
 	@clear
 	@cargo build
 
+# Generates the types
 protogen:
 	@clear
 	@cd proto; cargo run
