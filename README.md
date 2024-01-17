@@ -1,5 +1,7 @@
 # Dolev-Strong protocol
 
+***For demo, use latest tag***
+
 This is my attempt at implementing Dolev-Strong consensus protocol in Rust.
 
 Dolev-Strong is a consensus protocol for a single-shot consensus problem `Byzantine Broadcast`.
