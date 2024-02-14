@@ -1,4 +1,4 @@
-# Dolev-Strong protocol (***For demo, use latest tag***)
+# Dolev-Strong protocol (***For demo use latest tag***)
 
 This is my attempt at implementing Dolev-Strong consensus protocol in Rust.
 
